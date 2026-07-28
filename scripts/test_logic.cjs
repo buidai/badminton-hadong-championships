@@ -226,6 +226,25 @@ console.log('\n🔵 TEST 9: Tổng số trận (16 teams)')
   assert(total === 40, 'Tổng 40 trận (24 + 8 + 8)')
 }
 
+// ===== TEST: Seed 16-team grouping (4x4) =====
+console.log('\n🔵 TEST: Seed grouping 16 teams = 4 groups × 4')
+{
+  const groups = ['A', 'B', 'C', 'D']
+  const players = Array.from({ length: 16 }, (_, i) => i) // 16 mock players
+  const grouped = { A: [], B: [], C: [], D: [] }
+  players.forEach((p, i) => {
+    const gIdx = Math.floor(i / 4)
+    const pos = i % 4
+    const group = groups[gIdx]
+    const teamLabel = `${group}${pos + 1}`
+    grouped[group][pos] = teamLabel
+  })
+  const sizes = ['A', 'B', 'C', 'D'].map(g => grouped[g].length)
+  assert(JSON.stringify(sizes) === JSON.stringify([4, 4, 4, 4]), 'Mỗi bảng đúng 4 đội')
+  assert(grouped.A.join(',') === 'A1,A2,A3,A4', 'Bảng A = A1..A4')
+  assert(grouped.D.join(',') === 'D1,D2,D3,D4', 'Bảng D = D1..D4')
+}
+
 // ===== SUMMARY =====
 console.log(`\n${'='.repeat(50)}`)
 console.log(`📊 KẾT QUẢ: ${passed} passed, ${failed} failed`)

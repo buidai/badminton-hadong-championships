@@ -60,27 +60,27 @@ function App() {
   // Rules config (admin editable)
   const DEFAULT_RULES = {
     title: '📋 Thể lệ giải đấu',
-    subtitle: 'HD Badminton Beer Cup — Giải cầu lông đánh đôi nam-nữ hỗn hợp',
+    subtitle: 'HD Badminton Beer Cup — Giải cầu lông đôi nam – nữ hỗn hợp',
     sections: [
       {
         id: 'sec_1',
-        title: '🏸 Quy mô giải',
+        title: '🏸 Quy mô & bảng đấu',
         color: '#38bdf8',
         items: [
-          '16 đội thi đấu, mỗi đội gồm 1 nam + 1 nữ',
-          'Chia thành 4 bảng (A, B, C, D), mỗi bảng 4 đội',
-          'Vòng bảng: đánh vòng tròn — mỗi đội đấu 3 trận, mỗi bảng 6 trận'
+          '16 đội tham dự, mỗi đội gồm 1 nam + 1 nữ.',
+          'Chia 4 bảng A, B, C, D — mỗi bảng 4 đội.',
+          'Vòng bảng: vòng tròn 1 lượt — mỗi đội đấu 3 trận, mỗi bảng 6 trận (tổng 24 trận).'
         ]
       },
       {
         id: 'sec_2',
-        title: '📐 Thể thức thi đấu',
+        title: '📐 Thể thức vòng bảng',
         color: '#38bdf8',
         items: [
-          'Mỗi trận vòng bảng đánh 1 ván, tính đến 21 điểm theo luật cầu lông',
-          'Thắng = 1 điểm, Thua = 0 điểm (CHỈ tính ở vòng bảng để xếp hạng trong bảng)',
-          'Xếp hạng trong bảng: 1. Điểm nhiều hơn | 2. Đối đầu trực tiếp (head-to-head) | 3. Hiệu số điểm (tổng điểm thắng − tổng điểm thua)',
-          'Sau vòng bảng: xác định thứ hạng 1-4 của mỗi bảng để chia 4 nhóm phân hạng'
+          'Mỗi trận đánh 1 ván, tính đến 21 điểm (luật cầu lông), thắng đội trước 21 điểm (cách 2).',
+          'Thắng = 1 điểm · Thua = 0 điểm (chỉ tính điểm vòng bảng để xếp hạng bảng).',
+          'Xếp hạng bảng: (1) Điểm → (2) Đối đầu trực tiếp → (3) Hiệu số điểm (tổng ghi − tổng thủ).',
+          'Cuối vòng bảng mỗi bảng xác định thứ hạng 1→4 để chia 4 nhóm phân hạng.'
         ]
       },
       {
@@ -88,12 +88,12 @@ function App() {
         title: '🥊 Lượt 2 — Phân hạng',
         color: '#22c55e',
         items: [
-          'Sau vòng bảng, chia 4 nhóm theo thứ hạng bảng:',
-          '• Nhóm 1: 4 đội NHẤT bảng (A1, B1, C1, D1) → tranh hạng 1-4',
-          '• Nhóm 2: 4 đội NHÌ bảng (A2, B2, C2, D2) → tranh hạng 5-8',
-          '• Nhóm 3: 4 đội HẠNG 3 bảng (A3, B3, C3, D3) → tranh hạng 9-12',
-          '• Nhóm 4: 4 đội BÉT bảng (A4, B4, C4, D4) → tranh hạng 13-16',
-          'Lượt 2 (đối đầu trực tiếp): Nhóm 1: A1↔D1, B1↔C1 · Nhóm 2: A2↔D2, B2↔C2 · Nhóm 3: A3↔D3, B3↔C3 · Nhóm 4: A4↔D4, B4↔C4'
+          '16 đội chia 4 nhóm theo thứ hạng bảng:',
+          '• Nhóm 1: 4 đội NHẤT (A1, B1, C1, D1) → tranh hạng 1–4',
+          '• Nhóm 2: 4 đội NHÌ (A2, B2, C2, D2) → tranh hạng 5–8',
+          '• Nhóm 3: 4 đội HẠNG 3 (A3, B3, C3, D3) → tranh hạng 9–12',
+          '• Nhóm 4: 4 đội BÉT (A4, B4, C4, D4) → tranh hạng 13–16',
+          'Cặp đấu Lượt 2 (trực tiếp): Nhất A gặp Nhất D, Nhất B gặp Nhất C (tương tự các nhóm 2-3-4).'
         ]
       },
       {
@@ -101,33 +101,31 @@ function App() {
         title: '🏆 Lượt 3 — Chung kết phân hạng',
         color: '#f97316',
         items: [
-          'Mỗi nhóm: 2 đội THẮNG Lượt 2 gặp nhau tranh hạng cao, 2 đội THUA gặp nhau tranh hạng thấp',
-          'Nhóm 1: Thắng↔Thắng → Hạng 1-2 · Thua↔Thua → Hạng 3-4',
-          'Nhóm 2: Thắng↔Thắng → Hạng 5-6 · Thua↔Thua → Hạng 7-8',
-          'Nhóm 3: Thắng↔Thắng → Hạng 9-10 · Thua↔Thua → Hạng 11-12',
-          'Nhóm 4: Thắng↔Thắng → Hạng 13-14 · Thua↔Thua → Hạng 15-16',
-          'Lượt 2 & 3: CHỈ tính thắng/thua (không cộng điểm) — xếp hạng dựa vào nhóm tranh hạng rơi vào'
+          'Mỗi nhóm: 2 đội THẮNG Lượt 2 gặp nhau tranh hạng cao, 2 đội THUA gặp nhau tranh hạng thấp.',
+          'Nhóm 1: Thắng↔Thắng → Hạng 1–2 · Thua↔Thua → Hạng 3–4',
+          'Nhóm 2: Thắng↔Thắng → Hạng 5–6 · Thua↔Thua → Hạng 7–8',
+          'Nhóm 3: Thắng↔Thắng → Hạng 9–10 · Thua↔Thua → Hạng 11–12',
+          'Nhóm 4: Thắng↔Thắng → Hạng 13–14 · Thua↔Thua → Hạng 15–16',
+          'Lượt 2 & Lượt 3: CHỈ tính thắng/thua (không cộng điểm) — xếp hạng theo nhóm rơi vào.'
         ]
       },
       {
         id: 'sec_5',
-        title: '⚠️ Quy định đặc biệt',
+        title: '⚠️ Quy định kỹ thuật',
         color: '#ef4444',
         items: [
-          'Khi nam giao cầu sang nữ: không được đánh smash — chỉ được đánh cao tay (lob) hoặc nhẹ. Vi phạm → mất điểm.',
-          'Khi nữ giao cầu hoặc đánh trả: không giới hạn kỹ thuật.',
-          'Áp dụng luật cầu lông tiêu chuẩn BWF cho các tình huống khác.'
+          'Nam giao cầu sang nữ: KHÔNG được smash — chỉ lob/đánh cao tay hoặc nhẹ. Vi phạm → mất điểm.',
+          'Nữ giao cầu hoặc đánh trả: không giới hạn kỹ thuật.',
+          'Áp dụng luật cầu lông tiêu chuẩn BWF cho các tình huống còn lại.'
         ]
       },
       {
         id: 'sec_6',
-        title: '👨‍⚖️ Phân công trọng tài',
+        title: '👨‍⚖️ Trọng tài',
         color: '#8b5cf6',
         items: [
-          'Vòng bảng: đội không thi đấu trong lượt đó làm trọng tài',
-          'Ví dụ: Trận A1 vs A2 → Trọng tài là C3 (đội từ bảng khác)',
-          'Lượt 2 phân hạng: Trận 3A-3D → Trọng tài là 1.A (đội hạng 1 bảng A)',
-          'Chung kết phân hạng: Ban tổ chức phân công'
+          'Vòng bảng: đội không thi đấu lượt đó làm trọng tài (vd: A1 vs A2 → trọng tài C3).',
+          'Lượt 2 & Lượt 3: Ban tổ chức phân công trọng tài cho từng trận.'
         ]
       },
       {
@@ -135,10 +133,9 @@ function App() {
         title: '⭐ Bình chọn MVP',
         color: '#fbbf24',
         items: [
-          'Mỗi trận đấu có thể bình chọn 1 VĐV xuất sắc nhất',
-          'Không cần đăng nhập — mỗi người chỉ được bình chọn 1 lần / trận',
-          'VĐV MVP giải đấu = người nhận nhiều phiếu bình chọn nhất tổng cộng',
-          'Nhấn nút ⭐ MVP sau khi trận đấu kết thúc để bình chọn'
+          'Mỗi trận có thể bình chọn 1 VĐV xuất sắc nhất (nút ⭐ sau trận).',
+          'Không cần đăng nhập — mỗi người bình chọn 1 lần / trận.',
+          'MVP giải = VĐV nhận nhiều phiếu nhất sau toàn giải.'
         ]
       }
     ]
@@ -146,7 +143,7 @@ function App() {
 
   const [rulesData, setRulesData] = useState(DEFAULT_RULES)
   const [rulesEditOpen, setRulesEditOpen] = useState(false)
-  const [rulesOpen, setRulesOpen] = useState(false)
+  const [rulesOpen, setRulesOpen] = useState(true)
   const [rulesForm, setRulesForm] = useState(DEFAULT_RULES)
 
   // Comments

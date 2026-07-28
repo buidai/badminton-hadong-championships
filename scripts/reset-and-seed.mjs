@@ -59,8 +59,8 @@ async function seed() {
   const grouped = { A: [], B: [], C: [], D: [] }
 
   players.forEach((p, i) => {
-    const gIdx = Math.floor(i / 3)
-    const pos  = (i % 3)
+    const gIdx = Math.floor(i / 4)
+    const pos  = (i % 4)
     const group = groups[gIdx]
     const teamLabel = `${group}${pos + 1}`
     const ref = doc(teamsRef)
