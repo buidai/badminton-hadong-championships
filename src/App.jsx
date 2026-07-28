@@ -152,6 +152,16 @@ function App() {
   const [comments, setComments] = useState([])
   const [commentForm, setCommentForm] = useState({ playerName: '', text: '' })
 
+  // ─── Toast notifications (modern non-blocking replacement for alert) ───
+  const [toasts, setToasts] = useState([])
+  const toast = (message, type) => {
+    const t = typeof message === 'string' ? message : String(message)
+    const inferred = type || (/❌|lỗi|không|thất bại|sai/i.test(t) ? 'error' : /✅|thành công|đã|cập nhật/i.test(t) ? 'success' : 'info')
+    const id = Date.now() + Math.random()
+    setToasts(prev => [...prev, { id, message: t, type: inferred }])
+    setTimeout(() => setToasts(prev => prev.filter(x => x.id !== id)), 3400)
+  }
+
   const fetchTeams = async () => {
     const querySnapshot = await getDocs(collection(db, "teams"))
     const teamsData = []
@@ -453,7 +463,7 @@ function App() {
       })
 
       await batch.commit()
-      alert(`🎉 Đã xóa dữ liệu cũ và tạo mới ${totalTeams} cặp đấu mẫu (4 bảng x ${TEAMS_PER_GROUP} đội)!`)
+      toast(`🎉 Đã xóa dữ liệu cũ và tạo mới ${totalTeams} cặp đấu mẫu (4 bảng x ${TEAMS_PER_GROUP} đội)!`)
       fetchTeams()
     } catch (error) {
       console.error("Lỗi tạo dữ liệu: ", error)
@@ -469,7 +479,7 @@ function App() {
 
   const handleSaveNewTeam = async () => {
     if (!addTeamForm.name || !addTeamForm.player1 || !addTeamForm.player2) {
-      alert('Vui lòng điền đủ tên đội và tên 2 vận động viên')
+      toast('Vui lòng điền đủ tên đội và tên 2 vận động viên')
       return
     }
 
@@ -493,12 +503,12 @@ function App() {
         setsFor: 0,
         setsAgainst: 0
       })
-      alert(`✅ Đã thêm đội ${addTeamForm.name} vào bảng ${addTeamForm.group}`)
+      toast(`✅ Đã thêm đội ${addTeamForm.name} vào bảng ${addTeamForm.group}`)
       fetchTeams()
       setAddTeamModalOpen(false)
     } catch (err) {
       console.error('Lỗi thêm đội mới:', err)
-      alert('Lỗi khi thêm đội mới. Vui lòng thử lại.')
+      toast('Lỗi khi thêm đội mới. Vui lòng thử lại.')
     }
     setLoading(false)
   }
@@ -508,7 +518,7 @@ function App() {
     // Kiểm tra mỗi bảng có ít nhất 3 đội
     const minTeamsPerGroup = Math.min(...['A','B','C','D'].map(g => (groupedTeams[g] || []).length))
     if (minTeamsPerGroup < 3) {
-        alert(`Mỗi bảng cần ít nhất 3 đội. Hiện tại bảng nhỏ nhất chỉ có ${minTeamsPerGroup} đội.`); return;
+        toast(`Mỗi bảng cần ít nhất 3 đội. Hiện tại bảng nhỏ nhất chỉ có ${minTeamsPerGroup} đội.`); return;
       }
       setLoading(true)
       try {
@@ -578,7 +588,7 @@ function App() {
         })
   
         await batch.commit()
-        alert("🔥 Đã tạo thành công lịch thi đấu vòng tròn cho các bảng!")
+        toast("🔥 Đã tạo thành công lịch thi đấu vòng tròn cho các bảng!")
       } catch (error) {
         console.error("Lỗi tạo lịch thi đấu: ", error)
       }
@@ -596,11 +606,11 @@ function App() {
     try {
       const rulesRef = doc(db, 'config', 'rules')
       await setDoc(rulesRef, rulesForm)
-      alert('🎉 Đã cập nhật thể lệ giải đấu thành công!')
+      toast('🎉 Đã cập nhật thể lệ giải đấu thành công!')
       setRulesEditOpen(false)
     } catch (error) {
       console.error('Lỗi khi lưu thể lệ:', error)
-      alert('❌ Có lỗi khi lưu thể lệ: ' + error.message)
+      toast('❌ Có lỗi khi lưu thể lệ: ' + error.message)
     }
     setLoading(false)
   }
@@ -768,7 +778,7 @@ function App() {
       setAdminLoginOpen(false)
       setAdminForm({ user: '', pass: '' })
     } else {
-      alert('❌ Sai thông tin đăng nhập')
+      toast('❌ Sai thông tin đăng nhập')
     }
   }
 
@@ -812,7 +822,7 @@ function App() {
   const handleMvpVote = async (match, playerName) => {
     const key = `${match.id}`
     if (myVotes[key]) {
-      alert('Bạn đã bình chọn cho trận này rồi!')
+      toast('Bạn đã bình chọn cho trận này rồi!')
       return
     }
     try {
@@ -825,7 +835,7 @@ function App() {
       localStorage.setItem('hd_votes', JSON.stringify(updatedVotes))
       setMatches(prev => prev.map(m => m.id === match.id ? { ...m, mvpVotes: newVotes } : m))
       setMvpVoteOpen(null)
-      alert(`✅ Đã bình chọn MVP: ${playerName}`)
+      toast(`✅ Đã bình chọn MVP: ${playerName}`)
     } catch (err) {
       console.error('Lỗi bình chọn MVP:', err)
     }
@@ -850,7 +860,7 @@ function App() {
     }
 
     if (a == null || b == null || Number.isNaN(a) || Number.isNaN(b)) {
-      alert('Vui lòng nhập tỉ số hợp lệ (ví dụ: 21-19 hoặc 21,19)')
+      toast('Vui lòng nhập tỉ số hợp lệ (ví dụ: 21-19 hoặc 21,19)')
       return
     }
 
@@ -873,10 +883,10 @@ function App() {
         console.error('Lỗi khi resolve trận phụ thuộc:', e)
       }
 
-      alert('✅ Đã lưu kết quả và cập nhật thống kê')
+      toast('✅ Đã lưu kết quả và cập nhật thống kê')
     } catch (err) {
       console.error('Lỗi lưu kết quả:', err)
-      alert('Lỗi khi lưu kết quả. Vui lòng thử lại.')
+      toast('Lỗi khi lưu kết quả. Vui lòng thử lại.')
     }
   }
 
@@ -952,7 +962,7 @@ function App() {
     // Xác định số đội mỗi bảng (lấy min)
     const teamsPerGroup = Math.min(...groups.map(g => (standingsMap[g] || []).length))
     if (teamsPerGroup < 3) {
-      alert(`Mỗi bảng cần ít nhất 3 đội. Hiện tại bảng nhỏ nhất chỉ có ${teamsPerGroup} đội.`)
+      toast(`Mỗi bảng cần ít nhất 3 đội. Hiện tại bảng nhỏ nhất chỉ có ${teamsPerGroup} đội.`)
       return
     }
 
@@ -1075,10 +1085,10 @@ function App() {
       await batch.commit()
       const totalPhase2 = teamsPerGroup * 2
       const totalFinals = teamsPerGroup * 2
-      alert(`✅ Đã tạo ${totalPhase2} trận Lượt 2 + ${totalFinals} trận Chung kết phân hạng (${teamsPerGroup} đội/bảng). Tổng: ${totalPhase2 + totalFinals} trận mới.`)
+      toast(`✅ Đã tạo ${totalPhase2} trận Lượt 2 + ${totalFinals} trận Chung kết phân hạng (${teamsPerGroup} đội/bảng). Tổng: ${totalPhase2 + totalFinals} trận mới.`)
     } catch (err) {
       console.error('Lỗi tạo Lượt 2:', err)
-      alert('Lỗi khi tạo Lượt 2. Vui lòng thử lại.')
+      toast('Lỗi khi tạo Lượt 2. Vui lòng thử lại.')
     }
     setLoading(false)
   }
@@ -1107,12 +1117,12 @@ function App() {
       }
       await updateDoc(teamRef, payload)
       
-      alert("✅ Đã cập nhật thông tin thành công!")
+      toast("✅ Đã cập nhật thông tin thành công!")
       setSelectedTeam(null) // Đóng Modal
       fetchTeams() // Tải lại danh sách từ Firebase để giao diện tự sắp xếp lại bảng
     } catch (error) {
       console.error("Lỗi khi cập nhật đội:", error)
-      alert("Lỗi cập nhật. Vui lòng thử lại!")
+      toast("Lỗi cập nhật. Vui lòng thử lại!")
     }
   }
 
@@ -1153,12 +1163,12 @@ function App() {
         if (matchEditData.label != null) await resolveDependentMatchesByLabel(matchEditData.label)
       }
 
-      alert('✅ Đã lưu thay đổi trận đấu')
+      toast('✅ Đã lưu thay đổi trận đấu')
       setSelectedMatchEdit(null)
       setMatchEditData(null)
     } catch (err) {
       console.error('Lỗi lưu chỉnh sửa trận:', err)
-      alert('Lỗi khi lưu chỉnh sửa trận. Vui lòng thử lại.')
+      toast('Lỗi khi lưu chỉnh sửa trận. Vui lòng thử lại.')
     }
   }
 
@@ -1289,12 +1299,12 @@ function App() {
       await setDoc(bannerRef, bannerForm)
       setBannerData(bannerForm)
       setBannerEditOpen(false)
-    } catch(err) { console.error(err); alert('Lỗi lưu banner') }
+    } catch(err) { console.error(err); toast('Lỗi lưu banner') }
   }
 
   const handleSaveComment = async () => {
     if (!commentForm.playerName || !commentForm.text.trim()) {
-      alert('Vui lòng chọn tên và nhập nội dung bình luận')
+      toast('Vui lòng chọn tên và nhập nội dung bình luận')
       return
     }
     try {
@@ -1304,7 +1314,7 @@ function App() {
         timestamp: Date.now()
       })
       setCommentForm(prev => ({ ...prev, text: '' }))
-    } catch(err) { console.error(err); alert('Lỗi khi gửi bình luận') }
+    } catch(err) { console.error(err); toast('Lỗi khi gửi bình luận') }
   }
 
   const allPlayerNames = teams.flatMap(t => [t.player1, t.player2]).filter(Boolean)
@@ -1423,7 +1433,7 @@ function App() {
             <div className="hero-stats-row">
               <div className="hero-stat"><span className="hs-num">{teams.length || '—'}</span><span className="hs-label">Đội</span></div>
               <div className="hero-stat"><span className="hs-num">{Object.keys(groupedTeams).filter(g => groupedTeams[g].length > 0).length || 4}</span><span className="hs-label">Bảng</span></div>
-              <div className="hero-stat"><span className="hs-num">40</span><span className="hs-label">Trận</span></div>
+              <div className="hero-stat"><span className="hs-num">{matches.length || 0}</span><span className="hs-label">Trận</span></div>
               <div className="hero-stat"><span className="hs-num">{matches.filter(m => m.status === 'COMPLETED').length}</span><span className="hs-label">Xong ✅</span></div>
             </div>
             <div className="hero-meme">{todayMeme}</div>
@@ -1550,7 +1560,7 @@ function App() {
         ].map(({ key, label }) => (
           <button
             key={key}
-            onClick={() => setCurrentTab(key)}
+            onClick={() => { setCurrentTab(key); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
             className={`main-tab-btn ${currentTab === key ? 'active' : ''}`}
           >{label}</button>
         ))}
@@ -1719,8 +1729,8 @@ function App() {
           <h2 style={{ color: '#cbd5e1', marginBottom: 8 }}>Lịch Thi Đấu</h2>
           <div className="schedule-controls">
             <div className="stage-tabs">
-              <button className={`btn-tab ${scheduleStageTab === 'group' ? 'active' : ''}`} onClick={() => setScheduleStageTab('group')}>Vòng bảng</button>
-              <button className={`btn-tab ${scheduleStageTab === 'bracket' ? 'active' : ''}`} onClick={() => setScheduleStageTab('bracket')}>Sơ đồ vòng loại (Lượt 2 & 3)</button>
+              <button className={`btn-tab ${scheduleStageTab === 'group' ? 'active' : ''}`} onClick={() => { setScheduleStageTab('group'); window.scrollTo({ top: 0, behavior: 'smooth' }) }}>Vòng bảng</button>
+              <button className={`btn-tab ${scheduleStageTab === 'bracket' ? 'active' : ''}`} onClick={() => { setScheduleStageTab('bracket'); window.scrollTo({ top: 0, behavior: 'smooth' }) }}>Sơ đồ vòng loại (Lượt 2 & 3)</button>
             </div>
             {scheduleStageTab === 'group' && (
               <div className="filter-group">
@@ -2027,7 +2037,7 @@ function App() {
                         onChange={e => {
                           const file = e.target.files?.[0]
                           if (!file) return
-                          if (file.size > 200 * 1024) { alert('Ảnh quá lớn! Vui lòng chọn ảnh dưới 200KB.'); return }
+                          if (file.size > 200 * 1024) { toast('Ảnh quá lớn! Vui lòng chọn ảnh dưới 200KB.'); return }
                           const reader = new FileReader()
                           reader.onload = ev => setEditData(prev => ({ ...prev, iconUrl: ev.target.result }))
                           reader.readAsDataURL(file)
@@ -2120,9 +2130,9 @@ function App() {
               <button className="btn-save" onClick={async () => {
                 try {
                   await setDoc(doc(db, 'config', 'groupNames'), groupNamesForm, { merge: true })
-                  alert('Lưu tên bảng thành công!')
+                  toast('Lưu tên bảng thành công!')
                   setGroupNamesEditOpen(false)
-                } catch(e) { alert('Lỗi khi lưu tên bảng') }
+                } catch(e) { toast('Lỗi khi lưu tên bảng') }
               }}>💾 Lưu</button>
             </div>
           </div>
@@ -2330,6 +2340,12 @@ function App() {
           </div>
         </div>
       )}
+      {/* Toast notifications */}
+      <div className="toast-container">
+        {toasts.map(t => (
+          <div key={t.id} className={`toast toast--${t.type}`}>{t.message}</div>
+        ))}
+      </div>
      </div>
    )
 }
