@@ -453,7 +453,7 @@ function App() {
     setLoading(false)
   }
 
-  // 2. LOGIC TẠO LỊCH THI ĐẤU (Hỗ trợ bảng 3 đội round-robin)
+  // 2. LOGIC TẠO LỊCH THI ĐẤU (Hỗ trợ bảng 3 hoặc 4 đội round-robin)
   const generateSchedule = async () => {
     // Kiểm tra mỗi bảng có ít nhất 3 đội
     const minTeamsPerGroup = Math.min(...['A','B','C','D'].map(g => (groupedTeams[g] || []).length))
@@ -464,6 +464,12 @@ function App() {
       try {
         const batch = writeBatch(db)
         const matchesRef = collection(db, "matches")
+        
+        // --- Xóa lịch thi đấu vòng bảng cũ trước khi tạo mới để tránh duplicate ---
+        const oldMatchesSnap = await getDocs(query(matchesRef, where('stage', '==', 'GROUP_STAGE')))
+        oldMatchesSnap.forEach(d => {
+          batch.delete(doc(db, 'matches', d.id))
+        })
         
         // Pattern cho bảng 3 đội: 3 trận (round 1..3)
         const pattern3 = [
@@ -905,10 +911,16 @@ function App() {
       const batch = writeBatch(db)
       const matchesRef = collection(db, 'matches')
 
-      // matchOrder bắt đầu từ tổng số trận hiện tại
+      // --- Xóa các trận Phase 2 và Final cũ trước khi tạo mới ---
+      const oldPhase2 = await getDocs(query(matchesRef, where('stage', '==', 'PHASE2')))
+      oldPhase2.forEach(d => batch.delete(doc(db, 'matches', d.id)))
+      const oldFinals = await getDocs(query(matchesRef, where('stage', '==', 'FINAL')))
+      oldFinals.forEach(d => batch.delete(doc(db, 'matches', d.id)))
+
+      // matchOrder bắt đầu từ tổng số trận vòng bảng
       const groupStageCount = matches.filter(m => m.stage === 'GROUP_STAGE').length
       let labelCounter = groupStageCount
-      let matchOrderCounter = matches.length || 0
+      let matchOrderCounter = groupStageCount
 
       // === PHASE 2: Tạo cặp đấu theo hạng (bét → nhất) ===
       // Hạng R: A[R-1] ↔ D[R-1], B[R-1] ↔ C[R-1]
