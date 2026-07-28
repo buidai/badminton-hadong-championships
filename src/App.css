@@ -834,6 +834,96 @@ body {
   font-family: 'Inter', sans-serif;
 }
 
+/* ─── Match card edits inside Bracket */
+.bracket-match .match-card {
+  margin-bottom: 0;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+}
+
+/* Bracket UI */
+.bracket-section {
+  background: #1e293b;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 30px;
+  border-left: 5px solid #38bdf8;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+.bracket-section-title {
+  color: #fbbf24;
+  margin-top: 0;
+  margin-bottom: 24px;
+  font-size: 1.4rem;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.bracket-container {
+  display: flex;
+  justify-content: center;
+  gap: 50px;
+  align-items: center;
+  position: relative;
+  overflow-x: auto;
+  padding-bottom: 15px;
+}
+
+.bracket-col {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  position: relative;
+}
+
+.bracket-match {
+  position: relative;
+  min-width: 320px;
+}
+
+.bracket-col-title {
+  text-align: center;
+  color: #94a3b8;
+  font-weight: 700;
+  margin-bottom: 15px;
+  font-size: 1.1rem;
+  text-transform: uppercase;
+}
+
+/* Connectors lines */
+.bracket-col:first-child .bracket-match::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: -25px;
+  width: 25px;
+  border-top: 2px solid #475569;
+}
+
+.bracket-col:nth-child(2) .bracket-match::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -25px;
+  width: 25px;
+  border-top: 2px solid #475569;
+}
+
+/* Vertical line connecting semis to finals (simplified) */
+.bracket-col:first-child {
+  position: relative;
+}
+.bracket-connector-vertical {
+  position: absolute;
+  right: -26px;
+  top: calc(25% + 10px);
+  height: calc(50% - 20px);
+  width: 2px;
+  background: #475569;
+}
+
 /* ─── Team Cards (inside groups tab) ─── */
 .team-card {
   border-radius: var(--radius-sm);

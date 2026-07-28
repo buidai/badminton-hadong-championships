@@ -214,7 +214,56 @@ function App() {
       })
     } catch(e) { console.error('comments listener:', e) }
 
-    return () => { unsubMatches(); unsubBanner(); unsubRules(); unsubGroupNames(); unsubComments() }
+    // Expose simulation for end-to-end testing
+    window.simulateTournament = async () => {
+      console.log("🚀 Bắt đầu giả lập toàn bộ trận đấu...")
+      try {
+        let active = true
+        while (active) {
+          const snap = await getDocs(collection(db, 'matches'))
+          const allMatches = []
+          snap.forEach(d => allMatches.push({ id: d.id, ...d.data() }))
+          
+          const teamsSnap = await getDocs(collection(db, 'teams'))
+          const allTeams = []
+          teamsSnap.forEach(d => allTeams.push({ id: d.id, ...d.data() }))
+
+          const upcoming = allMatches.filter(m => m.status === 'UPCOMING')
+          if (upcoming.length === 0) {
+            console.log("✅ Không còn trận UPCOMING, kết thúc giả lập.")
+            break
+          }
+          const b = writeBatch(db)
+          upcoming.forEach(m => {
+            const aWins = Math.random() > 0.5
+            
+            // Random MVP logic
+            const tA = allTeams.find(t => t.id === m.teamA_id)
+            const tB = allTeams.find(t => t.id === m.teamB_id)
+            const players = [tA?.player1, tA?.player2, tB?.player1, tB?.player2].filter(Boolean)
+            const randomPlayer = players.length ? players[Math.floor(Math.random() * players.length)] : null
+            const mvpVotes = randomPlayer ? { [randomPlayer]: Math.floor(Math.random() * 20) + 1 } : {}
+
+            b.update(doc(db, 'matches', m.id), {
+              teamA_score: aWins ? 21 : Math.floor(Math.random()*10)+10,
+              teamB_score: aWins ? Math.floor(Math.random()*10)+10 : 21,
+              status: 'COMPLETED',
+              mvpVotes
+            })
+          })
+          await b.commit()
+          console.log(`Đã mô phỏng ${upcoming.length} trận (có vote MVP). Chờ 2s để hệ thống xử lý PENDING_SOURCE...`)
+          await new Promise(r => setTimeout(r, 2000)) // wait for useEffect to resolve PENDING_SOURCE
+        }
+        console.log("🎉 Hoàn tất toàn bộ giải đấu!")
+        return true
+      } catch (e) {
+        console.error("Lỗi giả lập:", e)
+        return false
+      }
+    }
+
+    return () => { unsubMatches(); unsubBanner(); unsubRules(); unsubGroupNames(); unsubComments(); delete window.simulateTournament }
   }, [])
 
   // Auto-triggers removed to prevent race-condition duplicates.
@@ -1271,6 +1320,69 @@ function App() {
     return Object.entries(map).sort((a, b) => b[1] - a[1])
   })()
 
+  const renderMatchCard = (match) => {
+    const stageLabel = match.stage === 'GROUP_STAGE' ? `Bảng ${match.group}` : match.stage === 'PHASE2' ? 'Lượt 2' : 'Chung kết'
+    const mc = getMatchColor(match)
+    const teamA = teams.find(t => t.id === match.teamA_id)
+    const teamB = teams.find(t => t.id === match.teamB_id)
+    const statusMap = { COMPLETED: { label: '✅ Kết thúc', cls: 'st-done' }, UPCOMING: { label: '⏳ Sắp đấu', cls: 'st-upcoming' }, PENDING_SOURCE: { label: '⏸ Chờ nguồn', cls: 'st-pending' } }
+    const stObj = statusMap[match.status] || statusMap.UPCOMING
+    return (
+      <div key={match.id} className="match-card" style={{ borderLeft: `4px solid ${mc}` }}>
+        <div className="mc-header">
+          <span className="mc-stage" style={{ background: hexToRgba(mc, 0.22), color: mc }}>{stageLabel}</span>
+          {match.label && <span className="mc-label">T{match.label}</span>}
+          <span className={`mc-status ${stObj.cls}`}>{stObj.label}</span>
+        </div>
+        <div className="mc-body">
+          <div className="mc-team mc-team-a">
+            <TeamLogo team={teamA} size={36} />
+            <span className="mc-tname">{match.teamA_name || '?'}</span>
+            {teamA && <span className="mc-players">{teamA.player1} &amp; {teamA.player2}</span>}
+          </div>
+          <div className="mc-score-col">
+            {isAdmin ? (
+              <input
+                type="text"
+                placeholder="21-19"
+                value={getScoreDisplayText(match.id, match)}
+                onChange={e => handleScoreChange(match.id, e.target.value)}
+                className="mc-score-input"
+              />
+            ) : (
+              <div className="mc-score-display">
+                {match.teamA_score != null && match.teamB_score != null
+                  ? `${match.teamA_score} – ${match.teamB_score}`
+                  : 'vs'}
+              </div>
+            )}
+          </div>
+          <div className="mc-team mc-team-b">
+            {teamB && <span className="mc-players">{teamB.player1} &amp; {teamB.player2}</span>}
+            <span className="mc-tname">{match.teamB_name || '?'}</span>
+            <TeamLogo team={teamB} size={36} />
+          </div>
+        </div>
+        {(isAdmin || match.status === 'COMPLETED') && (
+          <div className="mc-actions">
+            {isAdmin && (
+              <>
+                <button className="btn-primary btn-sm" onClick={() => handleSaveMatchResult(match)}>💾 Lưu</button>
+                <button className="btn-secondary btn-sm" onClick={() => setLocalScores(prev => ({ ...prev, [match.id]: { text: '' } }))}>↺</button>
+                <button className="btn-secondary btn-sm" onClick={() => openMatchEditModal(match)}>✏️</button>
+              </>
+            )}
+            {match.status === 'COMPLETED' && (
+              <button className="btn-mvp btn-sm" onClick={() => setMvpVoteOpen(match)}>
+                ⭐ MVP {myVotes[match.id] ? `· ${myVotes[match.id]}` : ''}
+              </button>
+            )}
+          </div>
+        )}
+      </div>
+    )
+  }
+
   return (
     <div className="app-container">
 
@@ -1310,7 +1422,7 @@ function App() {
             <div className="hero-stats-row">
               <div className="hero-stat"><span className="hs-num">{teams.length || '—'}</span><span className="hs-label">Đội</span></div>
               <div className="hero-stat"><span className="hs-num">{Object.keys(groupedTeams).filter(g => groupedTeams[g].length > 0).length || 4}</span><span className="hs-label">Bảng</span></div>
-              <div className="hero-stat"><span className="hs-num">{matches.length || '—'}</span><span className="hs-label">Trận</span></div>
+              <div className="hero-stat"><span className="hs-num">40</span><span className="hs-label">Trận</span></div>
               <div className="hero-stat"><span className="hs-num">{matches.filter(m => m.status === 'COMPLETED').length}</span><span className="hs-label">Xong ✅</span></div>
             </div>
             <div className="hero-meme">{todayMeme}</div>
@@ -1319,7 +1431,7 @@ function App() {
                 <button onClick={generateMockTeams} className="btn-hero-action" disabled={loading}>🎲 Tạo đội mẫu</button>
                 <button onClick={generateSchedule} className="btn-hero-action" disabled={loading}>📅 Tạo lịch vòng bảng</button>
                 <button onClick={generatePhase2AndFinals} className="btn-hero-action" disabled={loading}>🏆 Tạo lượt 2 & chung kết</button>
-                <button onClick={() => { setGroupNamesForm({...groupNames}); setGroupNamesEditOpen(true) }} className="btn-hero-action" disabled={loading}>🏷️ Đổi tên bảng</button>
+                <button onClick={() => setGroupNamesEditOpen(true)} style={{ display: 'none' }}></button>
               </div>
             )}
           </div>
@@ -1501,7 +1613,16 @@ function App() {
         <div className="groups-grid">
           {['A','B','C','D'].map(group => (
             <div key={group} className="group-card">
-              <h2 className="group-title">{getGroupDisplayName(group)}</h2>
+              <h2 className="group-title" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                {getGroupDisplayName(group)}
+                {isAdmin && (
+                  <button 
+                    onClick={() => { setGroupNamesForm({...groupNames}); setGroupNamesEditOpen(true) }} 
+                    style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '1rem', padding: 0 }}
+                    title="Đổi tên bảng"
+                  >✏️</button>
+                )}
+              </h2>
               <div style={{ display: 'grid', gap: 10 }}>
                 {(groupedTeams[group] || []).map(team => (
                   <div key={team.id} className="team-card" style={{ borderLeft: `4px solid ${getGroupColor(group)}`, background: hexToRgba(getGroupColor(group), 0.10), cursor: isAdmin ? 'pointer' : 'default' }} onClick={() => isAdmin && handleOpenEditModal(team)}>
@@ -1540,12 +1661,7 @@ function App() {
                   <tr>
                     <th>Hạng</th>
                     <th>Đội</th>
-                    <th>Bảng</th>
-                    <th>W</th>
-                    <th>L</th>
-                    <th>Trận</th>
-                    <th>SD</th>
-                    <th>Pts</th>
+                    <th>Danh hiệu</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1565,12 +1681,24 @@ function App() {
                           </div>
                         </div>
                       </td>
-                      <td className="cell-small">{team.group || '---'}</td>
-                      <td className="cell-small">{team.won}</td>
-                      <td className="cell-small">{team.lost}</td>
-                      <td className="cell-small">{team.played}</td>
-                      <td className="cell-small">{team.setDifference}</td>
-                      <td className="cell-points">{team.points}</td>
+                      <td className="cell-small" style={{ fontStyle: 'italic', color: '#fbbf24' }}>
+                        {(() => {
+                          const r = team.finalRank < 99 ? team.finalRank : idx + 1;
+                          switch(r) {
+                            case 1: return "Độc cô cầu bại 🏆";
+                            case 2: return "Dưới 1 người, trên vạn người 🥈";
+                            case 3: return "Chỉ thua nhà vô địch 🥉";
+                            case 4: return "Vua về tư 😅";
+                            case 5: return "Bá chủ top giữa 😎";
+                            case 15: return "Xin một lần thắng 🥲";
+                            case 16: return "Đam mê là chính, giải thưởng là phụ 🤣";
+                            default:
+                              if (r > 4 && r <= 8) return "Kẻ ngáng đường vĩ đại 🚧";
+                              if (r > 8 && r <= 12) return "Nghệ sĩ sân cầu 🏸";
+                              return "Tuyệt đỉnh phong trào 🍻";
+                          }
+                        })()}
+                      </td>
                     </tr>
                     )
                   })}
@@ -1615,8 +1743,7 @@ function App() {
           <div className="schedule-controls">
             <div className="stage-tabs">
               <button className={`btn-tab ${scheduleStageTab === 'group' ? 'active' : ''}`} onClick={() => setScheduleStageTab('group')}>Vòng bảng</button>
-              <button className={`btn-tab ${scheduleStageTab === 'phase2' ? 'active' : ''}`} onClick={() => setScheduleStageTab('phase2')}>Lượt 2 phân hạng</button>
-              <button className={`btn-tab ${scheduleStageTab === 'finals' ? 'active' : ''}`} onClick={() => setScheduleStageTab('finals')}>Chung kết phân hạng</button>
+              <button className={`btn-tab ${scheduleStageTab === 'bracket' ? 'active' : ''}`} onClick={() => setScheduleStageTab('bracket')}>Sơ đồ vòng loại (Lượt 2 & 3)</button>
             </div>
             {scheduleStageTab === 'group' && (
               <div className="filter-group">
@@ -1628,77 +1755,68 @@ function App() {
           </div>
 
           <div style={{ marginBottom: 14, color: '#94a3b8' }}>
-            {scheduleStageTab === 'group' ? 'Hiển thị danh sách trận vòng bảng.' : scheduleStageTab === 'phase2' ? 'Hiển thị danh sách Lượt 2 phân hạng.' : 'Hiển thị danh sách Chung kết phân hạng.'}
+            {scheduleStageTab === 'group' ? 'Hiển thị danh sách trận vòng bảng.' : 'Hiển thị sơ đồ thi đấu loại trực tiếp và phân hạng chung cuộc.'}
           </div>
  
-          {((scheduleStageTab === 'group' ? groupStageMatches : scheduleStageTab === 'phase2' ? phase2Matches : finalMatches).length === 0) ? (
+          {scheduleStageTab === 'group' && groupStageMatches.length === 0 ? (
             <div className="empty-state-card">
-              <p>{scheduleStageTab === 'group' ? 'Chưa có trận vòng bảng hoặc đang chờ tạo lịch.' : scheduleStageTab === 'phase2' ? 'Chưa có trận Lượt 2 phân hạng.' : 'Chưa có trận Chung kết phân hạng.'}</p>
+              <p>Chưa có trận vòng bảng hoặc đang chờ tạo lịch.</p>
+            </div>
+          ) : scheduleStageTab === 'bracket' && phase2Matches.length === 0 ? (
+            <div className="empty-state-card">
+              <p>Chưa có trận đấu vòng loại. Vui lòng tạo Lượt 2 & Chung kết.</p>
             </div>
           ) : (
-            <div style={{ display: 'grid', gap: 8 }}>
-              {(scheduleStageTab === 'group' ? groupStageMatches : scheduleStageTab === 'phase2' ? phase2Matches : finalMatches).map(match => {
-                const stageLabel = match.stage === 'GROUP_STAGE' ? `Bảng ${match.group}` : match.stage === 'PHASE2' ? 'Lượt 2' : 'Chung kết'
-                const mc = getMatchColor(match)
-                const teamA = teams.find(t => t.id === match.teamA_id)
-                const teamB = teams.find(t => t.id === match.teamB_id)
-                const statusMap = { COMPLETED: { label: '✅ Kết thúc', cls: 'st-done' }, UPCOMING: { label: '⏳ Sắp đấu', cls: 'st-upcoming' }, PENDING_SOURCE: { label: '⏸ Chờ nguồn', cls: 'st-pending' } }
-                const stObj = statusMap[match.status] || statusMap.UPCOMING
-                return (
-                  <div key={match.id} className="match-card" style={{ borderLeft: `4px solid ${mc}` }}>
-                    <div className="mc-header">
-                      <span className="mc-stage" style={{ background: hexToRgba(mc, 0.22), color: mc }}>{stageLabel}</span>
-                      {match.label && <span className="mc-label">T{match.label}</span>}
-                      <span className={`mc-status ${stObj.cls}`}>{stObj.label}</span>
-                    </div>
-                    <div className="mc-body">
-                      <div className="mc-team mc-team-a">
-                        <TeamLogo team={teamA} size={36} />
-                        <span className="mc-tname">{match.teamA_name || '?'}</span>
-                        {teamA && <span className="mc-players">{teamA.player1} &amp; {teamA.player2}</span>}
-                      </div>
-                      <div className="mc-score-col">
-                        {isAdmin ? (
-                          <input
-                            type="text"
-                            placeholder="21-19"
-                            value={getScoreDisplayText(match.id, match)}
-                            onChange={e => handleScoreChange(match.id, e.target.value)}
-                            className="mc-score-input"
-                          />
-                        ) : (
-                          <div className="mc-score-display">
-                            {match.teamA_score != null && match.teamB_score != null
-                              ? `${match.teamA_score} – ${match.teamB_score}`
-                              : 'vs'}
+            <div className="match-list">
+              {scheduleStageTab === 'group' ? (
+                <div style={{ display: 'grid', gap: 8 }}>
+                  {groupStageMatches.map(m => renderMatchCard(m))}
+                </div>
+              ) : (
+                <div className="bracket-wrapper">
+                  {[1, 2, 3, 4].map(rg => {
+                    const groupTitle = rg === 1 ? "🏆 Tranh hạng 1-4 (Nhất Bảng)" : rg === 2 ? "🎖️ Tranh hạng 5-8 (Nhì Bảng)" : rg === 3 ? "🎯 Tranh hạng 9-12 (Ba Bảng)" : "🛡️ Tranh hạng 13-16 (Bét Bảng)"
+                    const sf = phase2Matches.filter(m => m.rankGroup === rg).sort((a,b) => a.matchOrder - b.matchOrder)
+                    const baseRank = (rg - 1) * 4 + 1
+                    const finals = finalMatches.filter(m => m.rankWinner === baseRank || m.rankWinner === baseRank + 2).sort((a,b) => a.rankWinner - b.rankWinner)
+                    
+                    if(sf.length === 0) return null
+                    
+                    return (
+                      <div key={rg} className="bracket-section">
+                        <h3 className="bracket-section-title">{groupTitle}</h3>
+                        <div className="bracket-container">
+                          
+                          {/* Lượt 2 - Bán kết */}
+                          <div className="bracket-col">
+                            <div className="bracket-connector-vertical"></div>
+                            <div className="bracket-col-title">Lượt 2 (Bán kết)</div>
+                            {sf.map(m => (
+                              <div key={m.id} className="bracket-match">
+                                {renderMatchCard(m)}
+                              </div>
+                            ))}
                           </div>
-                        )}
+                          
+                          {/* Lượt 3 - Chung kết */}
+                          <div className="bracket-col" style={{ gap: '60px' }}>
+                            <div className="bracket-col-title">Lượt 3 (Chung kết)</div>
+                            {finals.map(m => (
+                              <div key={m.id} className="bracket-match">
+                                <div style={{ position: 'absolute', top: '-18px', left: '10px', fontSize: '0.8rem', color: m.rankWinner === baseRank ? '#fbbf24' : '#94a3b8', fontWeight: 'bold' }}>
+                                  {m.rankWinner === baseRank ? '🥇 Tranh hạng cao' : '🥉 Tranh hạng thấp'}
+                                </div>
+                                {renderMatchCard(m)}
+                              </div>
+                            ))}
+                          </div>
+
+                        </div>
                       </div>
-                      <div className="mc-team mc-team-b">
-                        {teamB && <span className="mc-players">{teamB.player1} &amp; {teamB.player2}</span>}
-                        <span className="mc-tname">{match.teamB_name || '?'}</span>
-                        <TeamLogo team={teamB} size={36} />
-                      </div>
-                    </div>
-                    {(isAdmin || match.status === 'COMPLETED') && (
-                      <div className="mc-actions">
-                        {isAdmin && (
-                          <>
-                            <button className="btn-primary btn-sm" onClick={() => handleSaveMatchResult(match)}>💾 Lưu</button>
-                            <button className="btn-secondary btn-sm" onClick={() => setLocalScores(prev => ({ ...prev, [match.id]: { text: '' } }))}>↺</button>
-                            <button className="btn-secondary btn-sm" onClick={() => openMatchEditModal(match)}>✏️</button>
-                          </>
-                        )}
-                        {match.status === 'COMPLETED' && (
-                          <button className="btn-mvp btn-sm" onClick={() => setMvpVoteOpen(match)}>
-                            ⭐ MVP {myVotes[match.id] ? `· ${myVotes[match.id]}` : ''}
-                          </button>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                )
-              })}
+                    )
+                  })}
+                </div>
+              )}
             </div>
           )}
         </div>
