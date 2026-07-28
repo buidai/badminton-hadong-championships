@@ -1167,9 +1167,13 @@ function App() {
         notes: matchEditData.notes || null
       }
 
-      // optional scores
-      if (matchEditData.teamA_score !== undefined) payload.teamA_score = matchEditData.teamA_score
-      if (matchEditData.teamB_score !== undefined) payload.teamB_score = matchEditData.teamB_score
+      // optional scores (coerce to Number to avoid string comparison bugs downstream)
+      if (matchEditData.teamA_score !== undefined && matchEditData.teamA_score !== null && matchEditData.teamA_score !== '') {
+        payload.teamA_score = Number(matchEditData.teamA_score)
+      }
+      if (matchEditData.teamB_score !== undefined && matchEditData.teamB_score !== null && matchEditData.teamB_score !== '') {
+        payload.teamB_score = Number(matchEditData.teamB_score)
+      }
 
       await updateDoc(matchRef, payload)
 
@@ -1218,8 +1222,8 @@ function App() {
       const src = await getMatchByLabel(label)
       if (!src) return
       // determine winner/loser ids
-      const aScore = src.teamA_score; const bScore = src.teamB_score
-      if (aScore == null || bScore == null) return
+      const aScore = Number(src.teamA_score); const bScore = Number(src.teamB_score)
+      if (aScore == null || bScore == null || isNaN(aScore) || isNaN(bScore)) return
       const winnerId = aScore > bScore ? src.teamA_id : src.teamB_id
       const winnerName = aScore > bScore ? src.teamA_name : src.teamB_name
       const loserId = aScore > bScore ? src.teamB_id : src.teamA_id

@@ -294,6 +294,21 @@ console.log('\n🔵 TEST: Bracket independent of vòng bảng group filter')
   assert(groupStageMatches(filteredA).length === 1, 'Vòng bảng vẫn lọc đúng theo Bảng A')
 }
 
+// ===== TEST: Score-string coercion (chống lỗi so sánh chuỗi "9" > "21") =====
+console.log('\n🔵 TEST: Winner detection với score lưu dạng string')
+{
+  // Trước fix: aScore/bScore là string → "9" > "21" = true (sai)
+  const resolveWinner = (aRaw, bRaw) => {
+    const a = Number(aRaw), b = Number(bRaw)
+    if (a == null || b == null || isNaN(a) || isNaN(b)) return null
+    return a > b ? 'A' : 'B'
+  }
+  assert(resolveWinner('9', '21') === 'B', 'String "9" vs "21" → thắng là B (21)')
+  assert(resolveWinner('21', '19') === 'A', 'String "21" vs "19" → thắng là A')
+  assert(resolveWinner('11', '9') === 'A', 'String "11" vs "9" → thắng là A')
+  assert(resolveWinner(null, '21') === null, 'Thiếu score (null) → không xác định winner')
+}
+
 // ===== SUMMARY =====
 console.log(`\n${'='.repeat(50)}`)
 console.log(`📊 KẾT QUẢ: ${passed} passed, ${failed} failed`)
