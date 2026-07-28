@@ -1493,11 +1493,17 @@ function App() {
         <div className="topbar-main">
           <div className="topbar-title">
             <span className="topbar-logo" aria-hidden="true">
-              <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="16" cy="20" r="6.5" fill="url(#gb)" stroke="#fbbf24" strokeWidth="1.4"/>
-                <path d="M16 13.5 L11 4 M16 13.5 L16 3 M16 13.5 L21 4 M16 13.5 L8.5 6.5 M16 13.5 L23.5 6.5" stroke="#e8edf5" strokeWidth="1.6" strokeLinecap="round"/>
+              <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                {/* badge base */}
+                <rect x="3" y="3" width="34" height="34" rx="10" fill="#0d1422" stroke="#fbbf24" strokeWidth="1.6"/>
+                {/* shuttlecock head (cork) */}
+                <circle cx="20" cy="25" r="5.2" fill="url(#lm)" stroke="#e8edf5" strokeWidth="1.1"/>
+                {/* feathers */}
+                <path d="M20 19.8 L14.5 9 M20 19.8 L20 7.5 M20 19.8 L25.5 9 M20 19.8 L11.5 12 M20 19.8 L28.5 12" stroke="#38bdf8" strokeWidth="1.5" strokeLinecap="round"/>
+                {/* HD monogram */}
+                <text x="20" y="33.5" textAnchor="middle" fontFamily="'Rajdhani', sans-serif" fontSize="7.5" fontWeight="700" fill="#fbbf24" letterSpacing="0.5">HD</text>
                 <defs>
-                  <radialGradient id="gb" cx="40%" cy="35%" r="70%">
+                  <radialGradient id="lm" cx="38%" cy="32%" r="70%">
                     <stop offset="0%" stopColor="#ffffff"/>
                     <stop offset="100%" stopColor="#cbd5e1"/>
                   </radialGradient>
@@ -1595,8 +1601,8 @@ function App() {
             </div>
             {isAdmin && (
               <div style={{ textAlign: 'center', marginTop: 14 }}>
-                <button className="btn-primary" onClick={handleOpenRulesEdit} style={{ background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)', color: '#0f172a' }}>
-                  ✏️ Chỉnh sửa thể lệ (Admin)
+                <button className="btn-primary" disabled title="Thể lệ được cố định trong code (Firestore chặn ghi config/rules)" style={{ background: 'rgba(148,163,184,0.12)', color: 'var(--dim)', cursor: 'not-allowed' }}>
+                  🔒 Thể lệ cố định (không thể sửa)
                 </button>
               </div>
             )}
@@ -1658,7 +1664,7 @@ function App() {
 
       {/** Standings View */}
       {currentTab === 'groupStandings' && (
-        <div className="groups-grid">
+        <div className="groups-grid tab-panel" key={`ts-${currentTab}`}>
             {['A','B','C','D'].map(group => {
               // computeStandingsForGroup already sorts with H2H tiebreaker
               const standings = computeStandingsForGroup(group)
@@ -1726,7 +1732,7 @@ function App() {
  
       {/** Overall standings view */}
       {currentTab === 'overall' && (
-        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 12px' }}>
+        <div className="tab-panel" key={`ts-${currentTab}`} style={{ maxWidth: 1100, margin: '0 auto', padding: '0 12px' }}>
           <div className="group-card" style={{ padding: 18, marginBottom: 18 }}>
             <h2 className="group-title">🏆 Xếp hạng chung cuộc</h2>
             {matches.some(m => m.stage === 'FINAL' && m.teamA_score != null) && (
@@ -1815,7 +1821,7 @@ function App() {
  
       {/** Schedule View */}
       {currentTab === 'schedule' && (
-        <div style={{ maxWidth: 1100, margin: '12px auto', padding: '0 12px' }}>
+        <div className="tab-panel" key={`ts-${currentTab}`} style={{ maxWidth: 1100, margin: '12px auto', padding: '0 12px' }}>
           <h2 style={{ color: '#cbd5e1', marginBottom: 8 }}>Lịch Thi Đấu</h2>
           <div className="schedule-controls">
             <div className="stage-tabs">

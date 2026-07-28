@@ -2095,3 +2095,15 @@ h2, h3 {
   font-family: 'Rajdhani', sans-serif;
   letter-spacing: -0.3px;
 }
+
+/* ─── Tab transition (fade + slide-up, 200ms) ─── */
+.tab-panel {
+  animation: tabFade 0.22s cubic-bezier(0.4,0,0.2,1);
+}
+@keyframes tabFade {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tab-panel { animation: none; }
+}
