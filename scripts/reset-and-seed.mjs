@@ -1,6 +1,6 @@
 /**
- * Reset Firestore data: clear teams + matches, then seed 12 mock teams
- * and generate round-robin group stage (3 matches per group).
+ * Reset Firestore data: clear teams + matches, then seed 16 mock teams
+ * (4 groups × 4 teams) and generate round-robin group stage (6 matches per group).
  * Run: node scripts/reset-and-seed.mjs
  */
 import { initializeApp } from 'firebase/app'
@@ -33,21 +33,25 @@ async function seed() {
   await deleteCollection('teams')
   await deleteCollection('matches')
 
-  console.log('\n👥 Creating 12 mock teams (4 groups × 3 teams)...')
+  console.log('\n👥 Creating 16 mock teams (4 groups × 4 teams)...')
   const groups = ['A', 'B', 'C', 'D']
   const players = [
-    ['VĐV 1', 'VĐV 2'],   // A1
-    ['VĐV 3', 'VĐV 4'],   // A2
-    ['VĐV 5', 'VĐV 6'],   // A3
-    ['VĐV 7', 'VĐV 8'],   // B1
-    ['VĐV 9', 'VĐV 10'],  // B2
-    ['VĐV 11', 'VĐV 12'], // B3
-    ['VĐV 13', 'VĐV 14'], // C1
-    ['VĐV 15', 'VĐV 16'], // C2
-    ['VĐV 17', 'VĐV 18'], // C3
-    ['VĐV 19', 'VĐV 20'], // D1
-    ['VĐV 21', 'VĐV 22'], // D2
-    ['VĐV 23', 'VĐV 24'], // D3
+    ['VĐV 1', 'VĐV 2'],     // A1
+    ['VĐV 3', 'VĐV 4'],     // A2
+    ['VĐV 5', 'VĐV 6'],     // A3
+    ['VĐV 7', 'VĐV 8'],     // A4
+    ['VĐV 9', 'VĐV 10'],    // B1
+    ['VĐV 11', 'VĐV 12'],   // B2
+    ['VĐV 13', 'VĐV 14'],   // B3
+    ['VĐV 15', 'VĐV 16'],   // B4
+    ['VĐV 17', 'VĐV 18'],   // C1
+    ['VĐV 19', 'VĐV 20'],   // C2
+    ['VĐV 21', 'VĐV 22'],   // C3
+    ['VĐV 23', 'VĐV 24'],   // C4
+    ['VĐV 25', 'VĐV 26'],   // D1
+    ['VĐV 27', 'VĐV 28'],   // D2
+    ['VĐV 29', 'VĐV 30'],   // D3
+    ['VĐV 31', 'VĐV 32'],   // D4
   ]
 
   const batch1 = writeBatch(db)
@@ -74,13 +78,15 @@ async function seed() {
   })
   await batch1.commit()
   console.log('  ✅ Teams created.')
-
-  console.log('\n📅 Generating round-robin schedule (3 matches per group)...')
-  // A1-A2, A2-A3, A1-A3
+  console.log('\n📅 Generating round-robin schedule (6 matches per group, 4-team pattern)...')
+  // 4-team round-robin: A1-A2, A3-A4 / A1-A3, A2-A4 / A1-A4, A2-A3
   const pattern = [
     { pA: 0, pB: 1, round: 1 },
-    { pA: 1, pB: 2, round: 2 },
-    { pA: 0, pB: 2, round: 3 }
+    { pA: 2, pB: 3, round: 1 },
+    { pA: 0, pB: 2, round: 2 },
+    { pA: 1, pB: 3, round: 2 },
+    { pA: 0, pB: 3, round: 3 },
+    { pA: 1, pB: 2, round: 3 }
   ]
 
   const batch2 = writeBatch(db)
@@ -106,10 +112,9 @@ async function seed() {
       console.log(`  T${matchOrder}: Bảng ${group} — ${ts[pA].label} vs ${ts[pB].label}`)
     })
   })
-
   await batch2.commit()
-  console.log(`\n✅ Done! 12 teams + 12 matches created.`)
-  console.log('👉 Open the app to edit real team names & players.')
+  console.log(`\n✅ Done! 16 teams + 24 group-stage matches created.`)
+  console.log('👉 Open the app, then use "Tạo lượt 2 & chung kết" to build the ranking playoffs.')
   process.exit(0)
 }
 

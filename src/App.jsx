@@ -67,9 +67,9 @@ function App() {
         title: '🏸 Quy mô giải',
         color: '#38bdf8',
         items: [
-          '12 đội thi đấu, mỗi đội gồm 1 nam + 1 nữ',
-          'Chia thành 4 bảng (A, B, C, D), mỗi bảng 3 đội',
-          'Vòng bảng: đánh vòng tròn — mỗi đội đấu 2 trận, mỗi bảng 3 trận'
+          '16 đội thi đấu, mỗi đội gồm 1 nam + 1 nữ',
+          'Chia thành 4 bảng (A, B, C, D), mỗi bảng 4 đội',
+          'Vòng bảng: đánh vòng tròn — mỗi đội đấu 3 trận, mỗi bảng 6 trận'
         ]
       },
       {
@@ -77,9 +77,10 @@ function App() {
         title: '📐 Thể thức thi đấu',
         color: '#38bdf8',
         items: [
-          'Mỗi trận đấu 1 ván, tính đến 21 điểm theo luật cầu lông',
-          'Thắng = 1 điểm, Thua = 0 điểm',
-          'Xếp hạng trong bảng: 1. Điểm nhiều hơn | 2. Đối đầu trực tiếp (head-to-head) | 3. Hiệu số điểm (tổng điểm thắng − tổng điểm thua)'
+          'Mỗi trận vòng bảng đánh 1 ván, tính đến 21 điểm theo luật cầu lông',
+          'Thắng = 1 điểm, Thua = 0 điểm (CHỈ tính ở vòng bảng để xếp hạng trong bảng)',
+          'Xếp hạng trong bảng: 1. Điểm nhiều hơn | 2. Đối đầu trực tiếp (head-to-head) | 3. Hiệu số điểm (tổng điểm thắng − tổng điểm thua)',
+          'Sau vòng bảng: xác định thứ hạng 1-4 của mỗi bảng để chia 4 nhóm phân hạng'
         ]
       },
       {
@@ -87,12 +88,12 @@ function App() {
         title: '🥊 Lượt 2 — Phân hạng',
         color: '#22c55e',
         items: [
-          'Trận 13: Hạng 3 Bảng A ↔ Hạng 3 Bảng D',
-          'Trận 14: Hạng 3 Bảng B ↔ Hạng 3 Bảng C',
-          'Trận 15: Hạng 2 Bảng A ↔ Hạng 2 Bảng D',
-          'Trận 16: Hạng 2 Bảng B ↔ Hạng 2 Bảng C',
-          'Trận 17: Hạng 1 Bảng A ↔ Hạng 1 Bảng D',
-          'Trận 18: Hạng 1 Bảng B ↔ Hạng 1 Bảng C'
+          'Sau vòng bảng, chia 4 nhóm theo thứ hạng bảng:',
+          '• Nhóm 1: 4 đội NHẤT bảng (A1, B1, C1, D1) → tranh hạng 1-4',
+          '• Nhóm 2: 4 đội NHÌ bảng (A2, B2, C2, D2) → tranh hạng 5-8',
+          '• Nhóm 3: 4 đội HẠNG 3 bảng (A3, B3, C3, D3) → tranh hạng 9-12',
+          '• Nhóm 4: 4 đội BÉT bảng (A4, B4, C4, D4) → tranh hạng 13-16',
+          'Lượt 2 (đối đầu trực tiếp): Nhóm 1: A1↔D1, B1↔C1 · Nhóm 2: A2↔D2, B2↔C2 · Nhóm 3: A3↔D3, B3↔C3 · Nhóm 4: A4↔D4, B4↔C4'
         ]
       },
       {
@@ -100,12 +101,12 @@ function App() {
         title: '🏆 Lượt 3 — Chung kết phân hạng',
         color: '#f97316',
         items: [
-          'Trận 19 (Hạng 9-10): Thắng T13 ↔ Thắng T14',
-          'Trận 20 (Hạng 11-12): Thua T13 ↔ Thua T14',
-          'Trận 21 (Hạng 5-6): Thắng T15 ↔ Thắng T16',
-          'Trận 22 (Hạng 7-8): Thua T15 ↔ Thua T16',
-          'Trận 23 (Hạng 1-2): Thắng T17 ↔ Thắng T18',
-          'Trận 24 (Hạng 3-4): Thua T17 ↔ Thua T18'
+          'Mỗi nhóm: 2 đội THẮNG Lượt 2 gặp nhau tranh hạng cao, 2 đội THUA gặp nhau tranh hạng thấp',
+          'Nhóm 1: Thắng↔Thắng → Hạng 1-2 · Thua↔Thua → Hạng 3-4',
+          'Nhóm 2: Thắng↔Thắng → Hạng 5-6 · Thua↔Thua → Hạng 7-8',
+          'Nhóm 3: Thắng↔Thắng → Hạng 9-10 · Thua↔Thua → Hạng 11-12',
+          'Nhóm 4: Thắng↔Thắng → Hạng 13-14 · Thua↔Thua → Hạng 15-16',
+          'Lượt 2 & 3: CHỈ tính thắng/thua (không cộng điểm) — xếp hạng dựa vào nhóm tranh hạng rơi vào'
         ]
       },
       {

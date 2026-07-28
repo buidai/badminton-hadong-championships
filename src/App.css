@@ -1462,4 +1462,149 @@ body {
     grid-template-columns: 1fr;
     gap: 8px;
   }
+  .mc-score-col {
+    order: -1;
+  }
+}
+
+/* ─── Enhanced Mobile (≤640px) ─── */
+@media (max-width: 640px) {
+  /* Hero: stack image below info, full width */
+  .hero-overlay {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 18px 14px;
+    min-height: auto;
+  }
+  .hero-right {
+    order: 2;
+  }
+  .hero-left {
+    order: 1;
+  }
+  .hero-img-wrap {
+    min-height: 140px;
+    max-height: 200px;
+  }
+  .hero-mvp-live {
+    margin-top: 4px;
+  }
+
+  /* Hero stats: keep on one row but smaller */
+  .hero-stats-row {
+    gap: 6px;
+  }
+  .hero-stat {
+    padding: 8px 10px;
+    min-width: 0;
+    flex: 1;
+  }
+  .hs-num {
+    font-size: 1.25rem;
+  }
+
+  /* Admin actions wrap nicely */
+  .hero-admin-actions {
+    gap: 6px;
+  }
+  .btn-hero-action {
+    flex: 1 1 auto;
+    font-size: 0.74rem;
+    padding: 7px 10px;
+    text-align: center;
+  }
+
+  /* Standings table: let it scroll horizontally, shrink cells */
+  .standings-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .standings-table th,
+  .standings-table td {
+    padding: 8px 7px;
+    font-size: 0.82rem;
+  }
+  .team-cell {
+    min-width: 120px;
+  }
+
+  /* Tabs: 2 columns already handled at 768; tighten at 640 */
+  .main-tabs-bar {
+    gap: 6px;
+    padding: 6px;
+  }
+  .main-tab-btn {
+    font-size: 0.82rem;
+    padding: 9px 6px;
+  }
+
+  /* Schedule stage tabs full width */
+  .stage-tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .btn-tab {
+    min-width: 0;
+    width: 100%;
+  }
+  .filter-group .btn-clear-option {
+    flex: 1 1 auto;
+    text-align: center;
+  }
+
+  /* Match card: stack team rows vertically with score in middle */
+  .match-card {
+    padding: 14px 12px;
+  }
+  .mc-header {
+    margin-bottom: 10px;
+  }
+
+  /* Bracket: horizontal scroll, keep columns readable */
+  .bracket-section {
+    padding: 16px 12px;
+  }
+  .bracket-container {
+    justify-content: flex-start;
+    gap: 24px;
+    padding-bottom: 12px;
+  }
+  .bracket-col {
+    min-width: 240px;
+    flex-shrink: 0;
+  }
+  .bracket-match {
+    min-width: 240px;
+  }
+
+  /* Modals: near full screen */
+  .modal-content {
+    padding: 18px 16px;
+    max-height: 92vh;
+  }
+  .modal-overlay {
+    padding: 10px;
+  }
+
+  /* Rules grid single column (already at 768) */
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+  .info-card {
+    padding: 18px 14px;
+  }
+}
+
+/* ─── Extra small phones (≤380px) ─── */
+@media (max-width: 380px) {
+  .hero-title {
+    font-size: 1.3rem;
+  }
+  .main-tab-btn {
+    font-size: 0.76rem;
+    padding: 8px 4px;
+  }
+  .groups-grid {
+    gap: 12px;
+  }
 }
