@@ -1804,14 +1804,20 @@ function App() {
                           <div className="bracket-col">
                             <div className="bracket-col-title">Lượt 3 (Chung kết)</div>
                             <div className="bracket-col-content">
-                              {finals.map(m => (
-                                <div key={m.id} className="bracket-match">
-                                  <div style={{ position: 'absolute', top: '-18px', left: '10px', fontSize: '0.8rem', color: m.rankWinner === baseRank ? '#fbbf24' : '#94a3b8', fontWeight: 'bold' }}>
-                                    {m.rankWinner === baseRank ? '🥇 Tranh hạng cao' : '🥉 Tranh hạng thấp'}
+                              {finals.map((m, idx) => {
+                                const isTop = m.rankWinner === baseRank;
+                                const forkColor = isTop ? '#2dd4bf' : '#c084fc';
+                                return (
+                                  <div key={m.id} className="bracket-match">
+                                    <div style={{ position: 'absolute', top: '-18px', left: '10px', fontSize: '0.8rem', color: isTop ? '#fbbf24' : '#94a3b8', fontWeight: 'bold' }}>
+                                      {isTop ? '🥇 Tranh hạng cao' : '🥉 Tranh hạng thấp'}
+                                    </div>
+                                    <div className="bracket-fork-stem" style={{'--fork-color': forkColor}}></div>
+                                    <div className="bracket-fork" style={{'--fork-color': forkColor}}></div>
+                                    {renderMatchCard(m)}
                                   </div>
-                                  {renderMatchCard(m)}
-                                </div>
-                              ))}
+                                )
+                              })}
                             </div>
                           </div>
 
@@ -1819,19 +1825,39 @@ function App() {
                           <div className="bracket-col">
                             <div className="bracket-col-title">Xếp hạng</div>
                             <div className="bracket-col-content">
-                              {[0, 1, 2, 3].map(offset => {
-                                const rank = baseRank + offset
-                                const team = computeOverallStandings().find(t => t.finalRank === rank)
-                                const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`
-                                return (
-                                  <div key={rank} className="bracket-result-card" style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'rgba(30, 41, 59, 0.9)', border: '1px solid rgba(56, 189, 248, 0.3)', padding: '12px 16px', borderRadius: 8, minWidth: 180, boxShadow: '0 4px 10px rgba(0,0,0,0.2)', color: '#e2e8f0', position: 'relative' }}>
-                                    <div style={{ fontWeight: 'bold', color: '#fbbf24', minWidth: '24px' }}>{medal}</div>
-                                    <div style={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontWeight: 600 }}>
-                                      {team ? team.name : '???'}
+                              
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: 15 }}>
+                                {[0, 1].map(offset => {
+                                  const rank = baseRank + offset
+                                  const team = computeOverallStandings().find(t => t.finalRank === rank)
+                                  const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`
+                                  return (
+                                    <div key={rank} className="bracket-result-card" style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'rgba(30, 41, 59, 0.9)', border: '1px solid rgba(56, 189, 248, 0.3)', padding: '12px 16px', borderRadius: 8, minWidth: 180, boxShadow: '0 4px 10px rgba(0,0,0,0.2)', color: '#e2e8f0', position: 'relative' }}>
+                                      <div style={{ fontWeight: 'bold', color: '#fbbf24', minWidth: '24px' }}>{medal}</div>
+                                      <div style={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontWeight: 600 }}>
+                                        {team ? team.name : '???'}
+                                      </div>
                                     </div>
-                                  </div>
-                                )
-                              })}
+                                  )
+                                })}
+                              </div>
+
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: 15 }}>
+                                {[2, 3].map(offset => {
+                                  const rank = baseRank + offset
+                                  const team = computeOverallStandings().find(t => t.finalRank === rank)
+                                  const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`
+                                  return (
+                                    <div key={rank} className="bracket-result-card" style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'rgba(30, 41, 59, 0.9)', border: '1px solid rgba(56, 189, 248, 0.3)', padding: '12px 16px', borderRadius: 8, minWidth: 180, boxShadow: '0 4px 10px rgba(0,0,0,0.2)', color: '#e2e8f0', position: 'relative' }}>
+                                      <div style={{ fontWeight: 'bold', color: '#fbbf24', minWidth: '24px' }}>{medal}</div>
+                                      <div style={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontWeight: 600 }}>
+                                        {team ? team.name : '???'}
+                                      </div>
+                                    </div>
+                                  )
+                                })}
+                              </div>
+
                             </div>
                           </div>
 

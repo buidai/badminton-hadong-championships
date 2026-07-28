@@ -921,22 +921,36 @@ body {
   border-top: 2px dashed #fbbf24;
 }
 
-.bracket-col:nth-child(2) .bracket-match::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  right: -25px;
-  width: 25px;
-  border-top: 2px solid #475569;
-}
-
 .bracket-result-card::before {
   content: '';
   position: absolute;
   top: 50%;
   left: -25px;
   width: 25px;
-  border-top: 2px solid #475569;
+  border-top: 2px solid transparent; /* Remove old connector, handled by fork */
+}
+
+/* Fork Connectors from Col 2 to Col 3 */
+.bracket-fork-stem {
+  position: absolute;
+  top: 50%;
+  right: -25px;
+  width: 25px;
+  border-top: 2px solid var(--fork-color, #2dd4bf);
+  box-shadow: 0 -2px 8px var(--fork-color, transparent);
+}
+
+.bracket-fork {
+  position: absolute;
+  top: calc(50% - 31px); /* roughly half of 62px to hit the center of 50px tall cards with 15px gap */
+  right: -50px;
+  width: 25px;
+  height: 62px;
+  border-top: 2px solid var(--fork-color, #2dd4bf);
+  border-bottom: 2px solid var(--fork-color, #2dd4bf);
+  border-right: 2px solid var(--fork-color, #2dd4bf);
+  border-radius: 0 8px 8px 0;
+  box-shadow: 2px 0 8px var(--fork-color, transparent);
 }
 
 /* Vertical line connecting semis to finals (simplified) */
