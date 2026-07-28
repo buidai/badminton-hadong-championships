@@ -1391,13 +1391,21 @@ body {
     padding: 0 16px 12px;
   }
   .main-tabs-bar {
-    overflow-x: auto;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    -webkit-overflow-scrolling: touch;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    padding: 8px;
+    border-radius: 12px;
   }
   .main-tab-btn {
     flex-shrink: 0;
+    width: 100%;
+    justify-content: center;
+    padding: 10px 8px;
+    font-size: 0.85rem;
+  }
+  .main-tab-btn:last-child:nth-child(odd) {
+    grid-column: span 2;
   }
   .groups-grid {
     grid-template-columns: 1fr;
