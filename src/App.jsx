@@ -77,10 +77,10 @@ function App() {
         title: '📐 Thể thức vòng bảng',
         color: '#38bdf8',
         items: [
-          'Mỗi trận đánh 1 ván, tính đến 21 điểm (luật cầu lông), thắng đội trước 21 điểm (cách 2).',
-          'Thắng = 1 điểm · Thua = 0 điểm (chỉ tính điểm vòng bảng để xếp hạng bảng).',
-          'Xếp hạng bảng: (1) Điểm → (2) Đối đầu trực tiếp → (3) Hiệu số điểm (tổng ghi − tổng thủ).',
-          'Cuối vòng bảng mỗi bảng xác định thứ hạng 1→4 để chia 4 nhóm phân hạng.'
+          'Mỗi trận đánh 1 set (ván), set tính đến 21 điểm theo luật cầu lông (đội chạm 21 điểm thắng, trừ trường hợp hòa 20-20 cần cách 2).',
+          'Thắng = 1 điểm · Thua = 0 điểm (chỉ tính điểm vòng bảng để xếp hạng trong bảng).',
+          'Xếp hạng bảng theo thứ tự: (1) Điểm (số trận thắng) → (2) Hiệu số điểm (tổng điểm ghi − tổng điểm thủ) → (3) Tên đội.',
+          'Cuối vòng bảng, mỗi bảng xác định thứ hạng 1→4 để chia 4 nhóm phân hạng.'
         ]
       },
       {
@@ -93,7 +93,7 @@ function App() {
           '• Nhóm 2: 4 đội NHÌ (A2, B2, C2, D2) → tranh hạng 5–8',
           '• Nhóm 3: 4 đội HẠNG 3 (A3, B3, C3, D3) → tranh hạng 9–12',
           '• Nhóm 4: 4 đội BÉT (A4, B4, C4, D4) → tranh hạng 13–16',
-          'Cặp đấu Lượt 2 (trực tiếp): Nhất A gặp Nhất D, Nhất B gặp Nhất C (tương tự các nhóm 2-3-4).'
+          'Cặp đấu Lượt 2 (trực tiếp): Nhất A gặp Nhất D, Nhất B gặp Nhất C (tương tự các nhóm 2, 3, 4).'
         ]
       },
       {
@@ -111,12 +111,12 @@ function App() {
       },
       {
         id: 'sec_5',
-        title: '⚠️ Quy định kỹ thuật',
+        title: '⚠️ Quy định kỹ thuật (đặc biệt)',
         color: '#ef4444',
         items: [
-          'Nam giao cầu sang nữ: KHÔNG được smash — chỉ lob/đánh cao tay hoặc nhẹ. Vi phạm → mất điểm.',
+          'Đây là giải đôi nam – nữ hỗn hợp, có luật riêng: Nam giao cầu sang nữ KHÔNG được đánh smash — chỉ được lob/đánh cao tay hoặc nhẹ. Vi phạm → xuất bóng, mất điểm.',
           'Nữ giao cầu hoặc đánh trả: không giới hạn kỹ thuật.',
-          'Áp dụng luật cầu lông tiêu chuẩn BWF cho các tình huống còn lại.'
+          'Các tình huống còn lại áp dụng luật cầu lông tiêu chuẩn BWF.'
         ]
       },
       {
@@ -133,9 +133,9 @@ function App() {
         title: '⭐ Bình chọn MVP',
         color: '#fbbf24',
         items: [
-          'Mỗi trận có thể bình chọn 1 VĐV xuất sắc nhất (nút ⭐ sau trận).',
+          'Mỗi trận (vòng bảng, Lượt 2, Lượt 3) có thể bình chọn 1 VĐV xuất sắc nhất (nút ⭐ trên mỗi trận).',
           'Không cần đăng nhập — mỗi người bình chọn 1 lần / trận.',
-          'MVP giải = VĐV nhận nhiều phiếu nhất sau toàn giải.'
+          'MVP giải = VĐV nhận nhiều phiếu nhất sau toàn giải (xem bảng xếp hạng MVP ở góc phải banner).'
         ]
       }
     ]
@@ -1581,6 +1581,10 @@ function App() {
         </button>
         {rulesOpen && (
           <div className="rules-panel-body">
+            <div className="rules-head">
+              <h2 className="rules-title">{rulesData.title || '📋 Thể lệ giải đấu'}</h2>
+              {rulesData.subtitle && <p className="rules-subtitle">{rulesData.subtitle}</p>}
+            </div>
             <div className="info-grid">
               {(rulesData.sections || []).map((sec, sIdx) => (
                 <div
