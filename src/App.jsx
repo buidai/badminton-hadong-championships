@@ -1434,9 +1434,14 @@ function App() {
     const aWin = completed && (m.teamA_score ?? -1) > (m.teamB_score ?? -2)
     const bWin = completed && (m.teamB_score ?? -1) > (m.teamA_score ?? -2)
     const locked = m.status === 'PENDING_SOURCE'
+    const gLetter = (teams.find(t => t.id === m.teamA_id) || {}).group
+    const gColor = gLetter ? getGroupColor(gLetter) : undefined
     return (
       <div className={`compact-match ${locked ? 'compact-match--locked' : ''}`}>
-        {tag && <div className="compact-match__tag">{tag}</div>}
+        <div className="compact-match__top">
+          {tag && <span className="compact-match__tag">{tag}</span>}
+          {gLetter && gColor && <span className="cm-group-badge" style={{ background: gColor, color: '#0f172a' }}>{gLetter}</span>}
+        </div>
         <div className={`cm-team ${aWin ? 'cm-win' : ''}`}>
           <span className="cm-name">{m.teamA_name || '?'}</span>
           {completed && <span className="cm-score">{m.teamA_score}</span>}
