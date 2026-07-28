@@ -1394,6 +1394,27 @@ function App() {
     )
   }
 
+  // Compact match for the horizontal bracket (mobile-friendly, no horizontal scroll)
+  const renderCompactMatch = (m, tag) => {
+    const completed = m.status === 'COMPLETED'
+    const aWin = completed && m.teamA_score > m.teamB_score
+    const bWin = completed && m.teamB_score > m.teamA_score
+    return (
+      <div className="compact-match">
+        {tag && <div className="compact-match__tag">{tag}</div>}
+        <div className={`cm-team ${aWin ? 'cm-win' : ''}`}>
+          <span className="cm-name">{m.teamA_name || '?'}</span>
+          {completed && <span className="cm-score">{m.teamA_score}</span>}
+        </div>
+        <div className="cm-vs">VS</div>
+        <div className={`cm-team ${bWin ? 'cm-win' : ''}`}>
+          <span className="cm-name">{m.teamB_name || '?'}</span>
+          {completed && <span className="cm-score">{m.teamB_score}</span>}
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="app-container">
 
@@ -1782,55 +1803,46 @@ function App() {
                           <span className="bracket-group__sub">{groupSub}</span>
                         </h3>
 
-                        {/* Lượt 2 */}
-                        <div className="bracket-round">
-                          <div className="bracket-round__label">⚔️ Lượt 2 · Bán kết</div>
-                          <div className="bracket-round__matches">
-                            {sf.map(m => (
-                              <div key={m.id} className="bracket-match-card">{renderMatchCard(m)}</div>
-                            ))}
+                        <div className="bracket-cols">
+                          {/* Lượt 2 */}
+                          <div className="bracket-col-c">
+                            <div className="bracket-col-c__head">⚔️ Lượt 2</div>
+                            <div className="bracket-col-c__body">
+                              {sf.map((m, idx) => (
+                                <div key={m.id}>{renderCompactMatch(m)}</div>
+                              ))}
+                            </div>
                           </div>
-                        </div>
 
-                        <div className="bracket-connector" aria-hidden="true">↓</div>
-
-                        {/* Lượt 3 */}
-                        <div className="bracket-round">
-                          <div className="bracket-round__label">🏁 Lượt 3 · Chung kết</div>
-                          <div className="bracket-round__matches">
-                            {topFinal && (
-                              <div className="bracket-match-card">
-                                <div className="bracket-match__tag bracket-match__tag--high">🥇 Tranh hạng {baseRank}-{baseRank+1}</div>
-                                {renderMatchCard(topFinal)}
-                              </div>
-                            )}
-                            {lowFinal && (
-                              <div className="bracket-match-card">
-                                <div className="bracket-match__tag bracket-match__tag--low">🥉 Tranh hạng {baseRank+2}-{baseRank+3}</div>
-                                {renderMatchCard(lowFinal)}
-                              </div>
-                            )}
+                          {/* Lượt 3 */}
+                          <div className="bracket-col-c">
+                            <div className="bracket-col-c__head">🏁 Lượt 3</div>
+                            <div className="bracket-col-c__body">
+                              {topFinal && (
+                                <div>{renderCompactMatch(topFinal, `🥇 ${baseRank}-${baseRank+1}`)}</div>
+                              )}
+                              {lowFinal && (
+                                <div>{renderCompactMatch(lowFinal, `🥉 ${baseRank+2}-${baseRank+3}`)}</div>
+                              )}
+                            </div>
                           </div>
-                        </div>
 
-                        <div className="bracket-connector" aria-hidden="true">↓</div>
-
-                        {/* Kết quả */}
-                        <div className="bracket-round">
-                          <div className="bracket-round__label">🏅 Xếp hạng chung cuộc</div>
-                          <div className="bracket-results">
-                            {[0,1,2,3].map(offset => {
-                              const rank = baseRank + offset
-                              const team = overall.find(t => t.finalRank === rank)
-                              const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`
-                              return (
-                                <div key={rank} className="bracket-rank-row">
-                                  <span className="bracket-rank-medal">{medal}</span>
-                                  <span className="bracket-rank-name">{team ? team.name : '???'}</span>
-                                  {team && <span className="bracket-rank-players">{team.player1} &amp; {team.player2}</span>}
-                                </div>
-                              )
-                            })}
+                          {/* Kết quả */}
+                          <div className="bracket-col-c">
+                            <div className="bracket-col-c__head">🏅 Kết quả</div>
+                            <div className="bracket-col-c__body">
+                              {[0,1,2,3].map(offset => {
+                                const rank = baseRank + offset
+                                const team = overall.find(t => t.finalRank === rank)
+                                const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`
+                                return (
+                                  <div key={rank} className="compact-rank">
+                                    <span className="compact-rank__medal">{medal}</span>
+                                    <span className="compact-rank__name">{team ? team.name : '???'}</span>
+                                  </div>
+                                )
+                              })}
+                            </div>
                           </div>
                         </div>
                       </div>
