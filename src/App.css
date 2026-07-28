@@ -874,9 +874,19 @@ body {
 .bracket-col {
   display: flex;
   flex-direction: column;
-  gap: 40px;
   position: relative;
 }
+
+.bracket-col-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  justify-content: center;
+  position: relative;
+}
+.bracket-col:nth-child(1) .bracket-col-content { gap: 40px; }
+.bracket-col:nth-child(2) .bracket-col-content { gap: 60px; }
+.bracket-col:nth-child(3) .bracket-col-content { gap: 15px; }
 
 .bracket-match {
   position: relative;
@@ -899,7 +909,7 @@ body {
   top: 50%;
   right: -25px;
   width: 25px;
-  border-top: 2px solid #475569;
+  border-top: 2px dashed #fbbf24; /* Highlight connector */
 }
 
 .bracket-col:nth-child(2) .bracket-match::before {
@@ -908,7 +918,7 @@ body {
   top: 50%;
   left: -25px;
   width: 25px;
-  border-top: 2px solid #475569;
+  border-top: 2px dashed #fbbf24;
 }
 
 .bracket-col:nth-child(2) .bracket-match::after {
@@ -930,7 +940,7 @@ body {
 }
 
 /* Vertical line connecting semis to finals (simplified) */
-.bracket-col:first-child {
+.bracket-col:first-child .bracket-col-content {
   position: relative;
 }
 .bracket-connector-vertical {
@@ -939,7 +949,7 @@ body {
   top: calc(25% + 10px);
   height: calc(50% - 20px);
   width: 2px;
-  background: #475569;
+  border-left: 2px dashed #fbbf24;
 }
 
 /* ─── Team Cards (inside groups tab) ─── */
