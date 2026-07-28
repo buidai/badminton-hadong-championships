@@ -960,6 +960,47 @@ body {
   padding: 0;
 }
 .cm-edit:active { transform: scale(0.92); }
+.cm-mvp {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  border: 1px solid rgba(251,191,36,0.4);
+  background: rgba(251,191,36,0.12);
+  color: #fbbf24;
+  font-size: 0.7rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+}
+.cm-mvp:active { transform: scale(0.92); }
+/* when both edit + mvp present, offset the mvp button left of edit */
+.compact-match--schedule { padding-top: 22px; }
+.compact-match__top {
+  position: absolute;
+  top: 3px;
+  left: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.cm-status-pill {
+  font-size: 0.62rem;
+  line-height: 1;
+}
+.compact-match__actions {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  display: flex;
+  gap: 4px;
+}
+.compact-match__actions .cm-edit,
+.compact-match__actions .cm-mvp {
+  position: static;
+}
 .compact-match__tag {
   font-size: 0.6rem;
   font-weight: 700;

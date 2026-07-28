@@ -245,6 +245,24 @@ console.log('\n🔵 TEST: Seed grouping 16 teams = 4 groups × 4')
   assert(grouped.D.join(',') === 'D1,D2,D3,D4', 'Bảng D = D1..D4')
 }
 
+// ===== TEST: MVP vote merge logic =====
+console.log('\n🔵 TEST: MVP vote merge (accumulates across users)')
+{
+  const mergeVote = (current, player) => ({ ...current, [player]: (current[player] || 0) + 1 })
+  let votes = {}
+  votes = mergeVote(votes, 'Anh Tuấn')
+  votes = mergeVote(votes, 'Anh Tuấn')
+  votes = mergeVote(votes, 'Hoàng Nam')
+  assert(votes['Anh Tuấn'] === 2, 'Cùng 1 VĐV cộng dồn thành 2 phiếu')
+  assert(votes['Hoàng Nam'] === 1, 'VĐV khác nhận 1 phiếu')
+  // double-vote guard
+  const myVotes = {}
+  const canVote = (id) => !myVotes[id]
+  assert(canVote('m1') === true, 'Chưa vote → được phép')
+  myVotes['m1'] = 'Anh Tuấn'
+  assert(canVote('m1') === false, 'Đã vote → chặn vote lại')
+}
+
 // ===== SUMMARY =====
 console.log(`\n${'='.repeat(50)}`)
 console.log(`📊 KẾT QUẢ: ${passed} passed, ${failed} failed`)

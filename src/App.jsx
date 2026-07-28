@@ -1392,11 +1392,45 @@ function App() {
     )
   }
 
+  // Schedule (vòng bảng) compact card: same tidy look as Lượt 2/3
+  const renderCompactScheduleMatch = (m) => {
+    const completed = m.status === 'COMPLETED'
+    const aWin = completed && (m.teamA_score ?? -1) > (m.teamB_score ?? -2)
+    const bWin = completed && (m.teamB_score ?? -1) > (m.teamA_score ?? -2)
+    const statusMap = { COMPLETED: { label: '✅', cls: 'st-done' }, UPCOMING: { label: '⏳', cls: 'st-upcoming' }, PENDING_SOURCE: { label: '⏸', cls: 'st-pending' } }
+    const stObj = statusMap[m.status] || statusMap.UPCOMING
+    return (
+      <div className="compact-match compact-match--schedule">
+        <div className="compact-match__top">
+          <span className="cm-status-pill">{stObj.label}</span>
+          {m.label && <span className="compact-match__tag">{m.label}</span>}
+        </div>
+        <div className={`cm-team ${aWin ? 'cm-win' : ''}`}>
+          <span className="cm-name">{m.teamA_name || '?'}</span>
+          {completed && <span className="cm-score">{m.teamA_score}</span>}
+        </div>
+        <div className="cm-vs">VS</div>
+        <div className={`cm-team ${bWin ? 'cm-win' : ''}`}>
+          <span className="cm-name">{m.teamB_name || '?'}</span>
+          {completed && <span className="cm-score">{m.teamB_score}</span>}
+        </div>
+        <div className="compact-match__actions">
+          {isAdmin && (
+            <button className="cm-edit" onClick={() => openMatchEditModal(m)} title="Sửa / nhập tỉ số">✏️</button>
+          )}
+          {completed && (
+            <button className="cm-mvp" onClick={() => setMvpVoteOpen(m)} title="Bình chọn MVP">⭐</button>
+          )}
+        </div>
+      </div>
+    )
+  }
+
   // Compact match for the horizontal bracket (mobile-friendly, no horizontal scroll)
   const renderCompactMatch = (m, tag) => {
     const completed = m.status === 'COMPLETED'
-    const aWin = completed && m.teamA_score > m.teamB_score
-    const bWin = completed && m.teamB_score > m.teamB_score
+    const aWin = completed && (m.teamA_score ?? -1) > (m.teamB_score ?? -2)
+    const bWin = completed && (m.teamB_score ?? -1) > (m.teamA_score ?? -2)
     const locked = m.status === 'PENDING_SOURCE'
     return (
       <div className={`compact-match ${locked ? 'compact-match--locked' : ''}`}>
@@ -1412,6 +1446,9 @@ function App() {
         </div>
         {isAdmin && !locked && (
           <button className="cm-edit" onClick={() => openMatchEditModal(m)} title="Sửa / nhập tỉ số">✏️</button>
+        )}
+        {completed && !locked && (
+          <button className="cm-mvp" onClick={() => setMvpVoteOpen(m)} title="Bình chọn MVP">⭐</button>
         )}
       </div>
     )
@@ -1817,7 +1854,7 @@ function App() {
             <div className="match-list">
               {scheduleStageTab === 'group' ? (
                 <div style={{ display: 'grid', gap: 8 }}>
-                  {groupStageMatches.map(m => renderMatchCard(m))}
+                  {groupStageMatches.map(m => renderCompactScheduleMatch(m))}
                 </div>
               ) : (
                 <div className="bracket-v2">
