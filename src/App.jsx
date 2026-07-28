@@ -141,7 +141,7 @@ function App() {
 
   const [rulesData, setRulesData] = useState(DEFAULT_RULES)
   const [rulesEditOpen, setRulesEditOpen] = useState(false)
-  const [rulesOpen, setRulesOpen] = useState(true)
+  const [rulesOpen, setRulesOpen] = useState(false)
   const [rulesForm, setRulesForm] = useState(DEFAULT_RULES)
 
   // Comments
@@ -1482,7 +1482,9 @@ function App() {
     <div className="app-container">
 
       {/* Compact Sticky Top Bar (Monitor surface) */}
-      <div className="topbar">
+      <div className="topbar" style={bannerData.imageUrl ? { backgroundImage: `linear-gradient(90deg, rgba(12,18,33,0.96) 30%, rgba(12,18,33,0.55) 100%), url(${bannerData.imageUrl})`, backgroundSize: 'cover', backgroundPosition: 'right center' } : {}}>
+        {/* faint smash/badminton backdrop */}
+        <div className="topbar-bg" aria-hidden="true" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=900&q=80)' }} />
         <div className="topbar-main">
           <div className="topbar-title">
             <span className="hero-live-badge">🏸 LIVE</span>
@@ -1499,13 +1501,21 @@ function App() {
           </div>
         </div>
         <div className="topbar-right">
-          {/* MVP Realtime mini */}
+          {/* MVP Realtime mini — top 3 */}
           <div className="topbar-mvp">
             <span className="topbar-mvp-title">⭐ Top MVP 🔴</span>
             {mvpLeaderboard.length === 0 ? (
               <span className="mvp-empty-mini">chưa có</span>
             ) : (
-              <span className="topbar-mvp-lead">{mvpLeaderboard[0][0]} ({mvpLeaderboard[0][1]})</span>
+              <div className="topbar-mvp-list">
+                {mvpLeaderboard.slice(0, 3).map(([player, votes], idx) => (
+                  <span key={player} className="topbar-mvp-item">
+                    <span className="topbar-mvp-rank">{idx === 0 ? '🥇' : idx === 1 ? '🥈' : '🥉'}</span>
+                    <span className="topbar-mvp-name">{player}</span>
+                    <span className="topbar-mvp-votes">{votes}</span>
+                  </span>
+                ))}
+              </div>
             )}
           </div>
           <div className="hero-auth-btn">
