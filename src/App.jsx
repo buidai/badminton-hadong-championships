@@ -1336,8 +1336,8 @@ function App() {
         </div>
         <div className="mc-body">
           <div className="mc-team mc-team-a">
-            <TeamLogo team={teamA} size={36} />
-            <span className="mc-tname">{match.teamA_name || '?'}</span>
+            <TeamLogo team={teamA} size={28} />
+            <span className="mc-tname" style={{ color: mc, textShadow: `0 0 12px ${mc}80`, fontSize: '1.15rem' }}>{match.teamA_name || '?'}</span>
             {teamA && <span className="mc-players">{teamA.player1} &amp; {teamA.player2}</span>}
           </div>
           <div className="mc-score-col">
@@ -1358,9 +1358,9 @@ function App() {
             )}
           </div>
           <div className="mc-team mc-team-b">
+            <TeamLogo team={teamB} size={28} />
+            <span className="mc-tname" style={{ color: mc, textShadow: `0 0 12px ${mc}80`, fontSize: '1.15rem' }}>{match.teamB_name || '?'}</span>
             {teamB && <span className="mc-players">{teamB.player1} &amp; {teamB.player2}</span>}
-            <span className="mc-tname">{match.teamB_name || '?'}</span>
-            <TeamLogo team={teamB} size={36} />
           </div>
         </div>
         {(isAdmin || match.status === 'COMPLETED') && (
@@ -1791,7 +1791,6 @@ function App() {
                           <div className="bracket-col">
                             <div className="bracket-col-title">Lượt 2 (Bán kết)</div>
                             <div className="bracket-col-content">
-                              <div className="bracket-connector-vertical"></div>
                               {sf.map(m => (
                                 <div key={m.id} className="bracket-match">
                                   {renderMatchCard(m)}
@@ -1808,12 +1807,10 @@ function App() {
                                 const isTop = m.rankWinner === baseRank;
                                 const forkColor = isTop ? '#2dd4bf' : '#c084fc';
                                 return (
-                                  <div key={m.id} className="bracket-match">
-                                    <div style={{ position: 'absolute', top: '-18px', left: '10px', fontSize: '0.8rem', color: isTop ? '#fbbf24' : '#94a3b8', fontWeight: 'bold' }}>
+                                  <div key={m.id} className="bracket-match" style={{'--fork-color': forkColor}}>
+                                    <div style={{ position: 'absolute', top: '-18px', left: '10px', fontSize: '0.8rem', color: isTop ? '#fbbf24' : '#94a3b8', fontWeight: 'bold', zIndex: 2 }}>
                                       {isTop ? '🥇 Tranh hạng cao' : '🥉 Tranh hạng thấp'}
                                     </div>
-                                    <div className="bracket-fork-stem" style={{'--fork-color': forkColor}}></div>
-                                    <div className="bracket-fork" style={{'--fork-color': forkColor}}></div>
                                     {renderMatchCard(m)}
                                   </div>
                                 )
@@ -1826,7 +1823,7 @@ function App() {
                             <div className="bracket-col-title">Xếp hạng</div>
                             <div className="bracket-col-content">
                               
-                              <div style={{ display: 'flex', flexDirection: 'column', gap: 15 }}>
+                              <div className="bracket-result-group" style={{ display: 'flex', flexDirection: 'column', gap: 15, '--fork-color': '#2dd4bf' }}>
                                 {[0, 1].map(offset => {
                                   const rank = baseRank + offset
                                   const team = computeOverallStandings().find(t => t.finalRank === rank)
@@ -1842,7 +1839,7 @@ function App() {
                                 })}
                               </div>
 
-                              <div style={{ display: 'flex', flexDirection: 'column', gap: 15 }}>
+                              <div className="bracket-result-group" style={{ display: 'flex', flexDirection: 'column', gap: 15, '--fork-color': '#c084fc' }}>
                                 {[2, 3].map(offset => {
                                   const rank = baseRank + offset
                                   const team = computeOverallStandings().find(t => t.finalRank === rank)

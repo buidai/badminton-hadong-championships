@@ -882,11 +882,9 @@ body {
   flex-direction: column;
   flex: 1;
   justify-content: center;
+  gap: 60px; /* Uniform gap for all columns ensures perfect horizontal alignment */
   position: relative;
 }
-.bracket-col:nth-child(1) .bracket-col-content { gap: 40px; }
-.bracket-col:nth-child(2) .bracket-col-content { gap: 60px; }
-.bracket-col:nth-child(3) .bracket-col-content { gap: 15px; }
 
 .bracket-match {
   position: relative;
@@ -903,67 +901,65 @@ body {
 }
 
 /* Connectors lines */
-.bracket-col:first-child .bracket-match::after {
+
+/* Col 1 -> Col 2 Connector (Dashed) */
+.bracket-col:nth-child(1) .bracket-match:first-child::after {
   content: '';
   position: absolute;
   top: 50%;
-  right: -25px;
-  width: 25px;
-  border-top: 2px dashed #fbbf24; /* Highlight connector */
+  right: -26px;
+  width: 26px;
+  height: calc(100% + 60px); /* Exactly spans from center of match 1 to match 2 */
+  border-top: 2px dashed #fbbf24;
+  border-right: 2px dashed #fbbf24;
+  border-bottom: 2px dashed #fbbf24;
+  border-radius: 0 8px 8px 0;
+  z-index: 0;
+}
+.bracket-col:nth-child(1) .bracket-match:last-child::after {
+  display: none;
 }
 
 .bracket-col:nth-child(2) .bracket-match::before {
   content: '';
   position: absolute;
   top: 50%;
-  left: -25px;
-  width: 25px;
+  left: -26px;
+  width: 26px;
   border-top: 2px dashed #fbbf24;
+  z-index: 0;
 }
 
-.bracket-result-card::before {
+/* Col 2 -> Col 3 Connector (Forks) */
+.bracket-col:nth-child(2) .bracket-match::after {
   content: '';
   position: absolute;
   top: 50%;
-  left: -25px;
-  width: 25px;
-  border-top: 2px solid transparent; /* Remove old connector, handled by fork */
-}
-
-/* Fork Connectors from Col 2 to Col 3 */
-.bracket-fork-stem {
-  position: absolute;
-  top: 50%;
-  right: -25px;
-  width: 25px;
+  right: -26px;
+  width: 26px;
   border-top: 2px solid var(--fork-color, #2dd4bf);
   box-shadow: 0 -2px 8px var(--fork-color, transparent);
+  z-index: 0;
 }
 
-.bracket-fork {
-  position: absolute;
-  top: calc(50% - 31px); /* roughly half of 62px to hit the center of 50px tall cards with 15px gap */
-  right: -50px;
-  width: 25px;
-  height: 62px;
-  border-top: 2px solid var(--fork-color, #2dd4bf);
-  border-bottom: 2px solid var(--fork-color, #2dd4bf);
-  border-right: 2px solid var(--fork-color, #2dd4bf);
-  border-radius: 0 8px 8px 0;
-  box-shadow: 2px 0 8px var(--fork-color, transparent);
-}
-
-/* Vertical line connecting semis to finals (simplified) */
-.bracket-col:first-child .bracket-col-content {
+.bracket-result-group {
   position: relative;
 }
-.bracket-connector-vertical {
+.bracket-result-group .bracket-result-card:first-child::before {
+  content: '';
   position: absolute;
-  right: -26px;
-  top: calc(25% + 10px);
-  height: calc(50% - 20px);
-  width: 2px;
-  border-left: 2px dashed #fbbf24;
+  top: 50%;
+  left: -26px;
+  width: 26px;
+  height: calc(100% + 15px); /* Exactly spans the 15px gap between the two result cards */
+  border-top: 2px solid var(--fork-color, #2dd4bf);
+  border-left: 2px solid var(--fork-color, #2dd4bf);
+  border-bottom: 2px solid var(--fork-color, #2dd4bf);
+  border-radius: 8px 0 0 8px;
+  box-shadow: -2px 0 8px var(--fork-color, transparent);
+}
+.bracket-result-group .bracket-result-card:last-child::before {
+  display: none;
 }
 
 /* ─── Team Cards (inside groups tab) ─── */
