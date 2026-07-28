@@ -1,0 +1,116 @@
+/**
+ * Reset Firestore data: clear teams + matches, then seed 12 mock teams
+ * and generate round-robin group stage (3 matches per group).
+ * Run: node scripts/reset-and-seed.mjs
+ */
+import { initializeApp } from 'firebase/app'
+import { getFirestore, collection, getDocs, writeBatch, doc } from 'firebase/firestore'
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDbprxt7KIjH48NNOgEQQpjrTlFzqOiSO4",
+  authDomain: "badminton-hadong-championships.firebaseapp.com",
+  projectId: "badminton-hadong-championships",
+  storageBucket: "badminton-hadong-championships.firebasestorage.app",
+  messagingSenderId: "342825512572",
+  appId: "1:342825512572:web:9769725024b338e4d523f9"
+}
+
+const app = initializeApp(firebaseConfig)
+const db = getFirestore(app)
+
+async function deleteCollection(colName) {
+  const snap = await getDocs(collection(db, colName))
+  if (snap.empty) { console.log(`  ${colName}: already empty`); return 0 }
+  const batch = writeBatch(db)
+  snap.forEach(d => batch.delete(doc(db, colName, d.id)))
+  await batch.commit()
+  console.log(`  ${colName}: deleted ${snap.size} documents`)
+  return snap.size
+}
+
+async function seed() {
+  console.log('\n🗑  Clearing Firestore collections...')
+  await deleteCollection('teams')
+  await deleteCollection('matches')
+
+  console.log('\n👥 Creating 12 mock teams (4 groups × 3 teams)...')
+  const groups = ['A', 'B', 'C', 'D']
+  const players = [
+    ['VĐV 1', 'VĐV 2'],   // A1
+    ['VĐV 3', 'VĐV 4'],   // A2
+    ['VĐV 5', 'VĐV 6'],   // A3
+    ['VĐV 7', 'VĐV 8'],   // B1
+    ['VĐV 9', 'VĐV 10'],  // B2
+    ['VĐV 11', 'VĐV 12'], // B3
+    ['VĐV 13', 'VĐV 14'], // C1
+    ['VĐV 15', 'VĐV 16'], // C2
+    ['VĐV 17', 'VĐV 18'], // C3
+    ['VĐV 19', 'VĐV 20'], // D1
+    ['VĐV 21', 'VĐV 22'], // D2
+    ['VĐV 23', 'VĐV 24'], // D3
+  ]
+
+  const batch1 = writeBatch(db)
+  const teamsRef = collection(db, 'teams')
+  const grouped = { A: [], B: [], C: [], D: [] }
+
+  players.forEach((p, i) => {
+    const gIdx = Math.floor(i / 3)
+    const pos  = (i % 3)
+    const group = groups[gIdx]
+    const teamLabel = `${group}${pos + 1}`
+    const ref = doc(teamsRef)
+    batch1.set(ref, {
+      name: `Đội ${teamLabel}`,
+      teamLabel,
+      player1: p[0],
+      player2: p[1],
+      group,
+      played: 0, won: 0, lost: 0, points: 0,
+      setDifference: 0, setsFor: 0, setsAgainst: 0
+    })
+    grouped[group][pos] = { id: ref.id, label: teamLabel, name: `Đội ${teamLabel}` }
+    console.log(`  ${teamLabel}: ${p[0]} & ${p[1]}`)
+  })
+  await batch1.commit()
+  console.log('  ✅ Teams created.')
+
+  console.log('\n📅 Generating round-robin schedule (3 matches per group)...')
+  // A1-A2, A2-A3, A1-A3
+  const pattern = [
+    { pA: 0, pB: 1, round: 1 },
+    { pA: 1, pB: 2, round: 2 },
+    { pA: 0, pB: 2, round: 3 }
+  ]
+
+  const batch2 = writeBatch(db)
+  const matchesRef = collection(db, 'matches')
+  let matchOrder = 0
+
+  groups.forEach(group => {
+    const ts = grouped[group]
+    pattern.forEach(({ pA, pB, round }) => {
+      matchOrder++
+      const ref = doc(matchesRef)
+      batch2.set(ref, {
+        group,
+        round,
+        stage: 'GROUP_STAGE',
+        teamA_id: ts[pA].id,
+        teamA_name: ts[pA].name,
+        teamB_id: ts[pB].id,
+        teamB_name: ts[pB].name,
+        status: 'UPCOMING',
+        matchOrder
+      })
+      console.log(`  T${matchOrder}: Bảng ${group} — ${ts[pA].label} vs ${ts[pB].label}`)
+    })
+  })
+
+  await batch2.commit()
+  console.log(`\n✅ Done! 12 teams + 12 matches created.`)
+  console.log('👉 Open the app to edit real team names & players.')
+  process.exit(0)
+}
+
+seed().catch(err => { console.error('❌ Error:', err); process.exit(1) })

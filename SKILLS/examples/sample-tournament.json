@@ -1,0 +1,102 @@
+{
+  "tournament": {
+    "id": 1,
+    "name": "Vietnam Esports Championship 2026",
+    "game": "League of Legends",
+    "format": "single_elimination",
+    "status": "ongoing",
+    "max_teams": 16,
+    "prize_pool": "$50,000",
+    "start_date": "2026-08-01T10:00:00+07:00",
+    "end_date": "2026-08-15T20:00:00+07:00",
+    "description": "Giải đấu Esports lớn nhất Việt Nam 2026",
+    "current_round": 2
+  },
+  "teams": [
+    { "id": 1, "name": "GAM Esports", "tag": "GAM", "seed": 1, "region": "VN", "wins": 5, "losses": 1, "points": 15 },
+    { "id": 2, "name": "Team Flash", "tag": "FL", "seed": 2, "region": "VN", "wins": 4, "losses": 2, "points": 12 },
+    { "id": 3, "name": "Saigon Buffalo", "tag": "SGB", "seed": 3, "region": "VN", "wins": 4, "losses": 2, "points": 12 },
+    { "id": 4, "name": "SBTC Esports", "tag": "SBTC", "seed": 4, "region": "VN", "wins": 3, "losses": 3, "points": 9 },
+    { "id": 5, "name": "Team Secret", "tag": "TS", "seed": 5, "region": "VN", "wins": 3, "losses": 3, "points": 9 },
+    { "id": 6, "name": "Cerberus Esports", "tag": "CES", "seed": 6, "region": "VN", "wins": 3, "losses": 3, "points": 9 },
+    { "id": 7, "name": "Vikings Gaming", "tag": "VKG", "seed": 7, "region": "VN", "wins": 2, "losses": 4, "points": 6 },
+    { "id": 8, "name": "Luxury Esports", "tag": "LX", "seed": 8, "region": "VN", "wins": 2, "losses": 4, "points": 6 },
+    { "id": 9, "name": "Burst The Sky", "tag": "BTS", "seed": 9, "region": "VN", "wins": 2, "losses": 4, "points": 6 },
+    { "id": 10, "name": "GMedia Dolphins", "tag": "DLP", "seed": 10, "region": "VN", "wins": 1, "losses": 5, "points": 3 },
+    { "id": 11, "name": "Rainbow Warriors", "tag": "RBW", "seed": 11, "region": "VN", "wins": 1, "losses": 5, "points": 3 },
+    { "id": 12, "name": "Percent Esports", "tag": "PE", "seed": 12, "region": "VN", "wins": 1, "losses": 5, "points": 3 },
+    { "id": 13, "name": "Dominus Esports", "tag": "DMN", "seed": 13, "region": "VN", "wins": 1, "losses": 5, "points": 3 },
+    { "id": 14, "name": "One Team", "tag": "OT", "seed": 14, "region": "VN", "wins": 0, "losses": 6, "points": 0 },
+    { "id": 15, "name": "Celeb Gaming", "tag": "CLB", "seed": 15, "region": "VN", "wins": 0, "losses": 6, "points": 0 },
+    { "id": 16, "name": "Aurora Esports", "tag": "AUR", "seed": 16, "region": "VN", "wins": 0, "losses": 6, "points": 0 }
+  ],
+  "matches": [
+    {
+      "id": 1, "round": 1, "match_number": 1, "best_of": 3,
+      "team1_id": 1, "team2_id": 16, "score1": 2, "score2": 0,
+      "winner_id": 1, "status": "completed",
+      "scheduled_at": "2026-08-01T10:00:00+07:00"
+    },
+    {
+      "id": 2, "round": 1, "match_number": 2, "best_of": 3,
+      "team1_id": 8, "team2_id": 9, "score1": 2, "score2": 1,
+      "winner_id": 8, "status": "completed",
+      "scheduled_at": "2026-08-01T13:00:00+07:00"
+    },
+    {
+      "id": 3, "round": 1, "match_number": 3, "best_of": 3,
+      "team1_id": 5, "team2_id": 12, "score1": 2, "score2": 0,
+      "winner_id": 5, "status": "completed",
+      "scheduled_at": "2026-08-01T16:00:00+07:00"
+    },
+    {
+      "id": 4, "round": 1, "match_number": 4, "best_of": 3,
+      "team1_id": 4, "team2_id": 13, "score1": 2, "score2": 1,
+      "winner_id": 4, "status": "completed",
+      "scheduled_at": "2026-08-02T10:00:00+07:00"
+    },
+    {
+      "id": 5, "round": 1, "match_number": 5, "best_of": 3,
+      "team1_id": 3, "team2_id": 14, "score1": 2, "score2": 0,
+      "winner_id": 3, "status": "completed",
+      "scheduled_at": "2026-08-02T13:00:00+07:00"
+    },
+    {
+      "id": 6, "round": 1, "match_number": 6, "best_of": 3,
+      "team1_id": 6, "team2_id": 11, "score1": 1, "score2": 2,
+      "winner_id": 11, "status": "completed",
+      "scheduled_at": "2026-08-02T16:00:00+07:00"
+    },
+    {
+      "id": 7, "round": 1, "match_number": 7, "best_of": 3,
+      "team1_id": 7, "team2_id": 10, "score1": null, "score2": null,
+      "winner_id": null, "status": "live",
+      "scheduled_at": "2026-08-03T10:00:00+07:00"
+    },
+    {
+      "id": 8, "round": 1, "match_number": 8, "best_of": 3,
+      "team1_id": 2, "team2_id": 15, "score1": null, "score2": null,
+      "winner_id": null, "status": "upcoming",
+      "scheduled_at": "2026-08-03T13:00:00+07:00"
+    },
+    {
+      "id": 9, "round": 2, "match_number": 1, "best_of": 3,
+      "team1_id": 1, "team2_id": 8, "score1": null, "score2": null,
+      "winner_id": null, "status": "upcoming",
+      "scheduled_at": "2026-08-05T10:00:00+07:00"
+    },
+    {
+      "id": 10, "round": 2, "match_number": 2, "best_of": 3,
+      "team1_id": 5, "team2_id": 4, "score1": null, "score2": null,
+      "winner_id": null, "status": "upcoming",
+      "scheduled_at": "2026-08-05T13:00:00+07:00"
+    }
+  ],
+  "players": [
+    { "id": 1, "nickname": "Levi", "real_name": "Đỗ Duy Khánh", "team_id": 1, "role": "Jungle", "country": "VN" },
+    { "id": 2, "nickname": "Kiaya", "real_name": "Phạm Trung Kiên", "team_id": 1, "role": "Top", "country": "VN" },
+    { "id": 3, "nickname": "Kati", "real_name": "Nguyễn Hữu Đạt", "team_id": 1, "role": "Mid", "country": "VN" },
+    { "id": 4, "nickname": "Slayder", "real_name": "Nguyễn Quốc Huy", "team_id": 1, "role": "ADC", "country": "VN" },
+    { "id": 5, "nickname": "Palette", "real_name": "Trần Quốc Hùng", "team_id": 1, "role": "Support", "country": "VN" }
+  ]
+}
