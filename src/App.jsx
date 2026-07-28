@@ -1419,7 +1419,7 @@ function App() {
     const stObj = statusMap[m.status] || statusMap.UPCOMING
     const gColor = getGroupColor(m.group)
     return (
-      <div className="compact-match compact-match--schedule" style={{ borderLeft: `4px solid ${gColor}` }}>
+      <div className="compact-match compact-match--schedule" style={{ borderLeft: `4px solid ${gColor}`, '--gc': gColor }}>
         <div className="compact-match__top">
           <span className="cm-status-pill">{stObj.label}</span>
           {m.label && <span className="compact-match__tag">{m.label}</span>}
@@ -1454,7 +1454,7 @@ function App() {
     const gLetter = (teams.find(t => t.id === m.teamA_id) || {}).group
     const gColor = gLetter ? getGroupColor(gLetter) : undefined
     return (
-      <div className={`compact-match ${locked ? 'compact-match--locked' : ''}`}>
+      <div className={`compact-match ${locked ? 'compact-match--locked' : ''}`} style={gColor ? { '--gc': gColor } : undefined}>
         <div className="compact-match__top">
           {tag && <span className="compact-match__tag">{tag}</span>}
           {gLetter && gColor && <span className="cm-group-badge" style={{ background: gColor, color: '#0f172a' }}>{gLetter}</span>}
@@ -1487,6 +1487,18 @@ function App() {
         <div className="topbar-bg" aria-hidden="true" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=900&q=80)' }} />
         <div className="topbar-main">
           <div className="topbar-title">
+            <span className="topbar-logo" aria-hidden="true">
+              <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="16" cy="20" r="6.5" fill="url(#gb)" stroke="#fbbf24" strokeWidth="1.4"/>
+                <path d="M16 13.5 L11 4 M16 13.5 L16 3 M16 13.5 L21 4 M16 13.5 L8.5 6.5 M16 13.5 L23.5 6.5" stroke="#e8edf5" strokeWidth="1.6" strokeLinecap="round"/>
+                <defs>
+                  <radialGradient id="gb" cx="40%" cy="35%" r="70%">
+                    <stop offset="0%" stopColor="#ffffff"/>
+                    <stop offset="100%" stopColor="#cbd5e1"/>
+                  </radialGradient>
+                </defs>
+              </svg>
+            </span>
             <span className="hero-live-badge">🏸 LIVE</span>
             <h1 className="topbar-h1">{bannerData.title || 'HD Badminton Beer Cup 🏸'}</h1>
             {isAdmin && (
@@ -1647,7 +1659,7 @@ function App() {
               const standings = computeStandingsForGroup(group)
 
               return (
-                <div key={group} className="group-card" style={{ borderTop: `4px solid ${getGroupColor(group)}` }}>
+                <div key={group} className="group-card" style={{ borderTop: `4px solid ${getGroupColor(group)}`, '--gc': getGroupColor(group) }}>
                   <h2 className="group-title" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: getGroupColor(group) }}>
                     {getGroupDisplayName(group)}
                     {isAdmin && (
