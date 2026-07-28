@@ -1811,6 +1811,24 @@ function App() {
                             ))}
                           </div>
 
+                          {/* Cột 3 - Xếp hạng */}
+                          <div className="bracket-col" style={{ gap: '15px', justifyContent: 'center' }}>
+                            <div className="bracket-col-title">Xếp hạng</div>
+                            {[0, 1, 2, 3].map(offset => {
+                              const rank = baseRank + offset
+                              const team = computeOverallStandings().find(t => t.finalRank === rank)
+                              const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`
+                              return (
+                                <div key={rank} className="bracket-result-card" style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'rgba(30, 41, 59, 0.9)', border: '1px solid rgba(56, 189, 248, 0.3)', padding: '12px 16px', borderRadius: 8, minWidth: 180, boxShadow: '0 4px 10px rgba(0,0,0,0.2)', color: '#e2e8f0', position: 'relative' }}>
+                                  <div style={{ fontWeight: 'bold', color: '#fbbf24', minWidth: '24px' }}>{medal}</div>
+                                  <div style={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontWeight: 600 }}>
+                                    {team ? team.name : '???'}
+                                  </div>
+                                </div>
+                              )
+                            })}
+                          </div>
+
                         </div>
                       </div>
                     )

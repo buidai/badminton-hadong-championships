@@ -911,6 +911,24 @@ body {
   border-top: 2px solid #475569;
 }
 
+.bracket-col:nth-child(2) .bracket-match::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: -25px;
+  width: 25px;
+  border-top: 2px solid #475569;
+}
+
+.bracket-result-card::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -25px;
+  width: 25px;
+  border-top: 2px solid #475569;
+}
+
 /* Vertical line connecting semis to finals (simplified) */
 .bracket-col:first-child {
   position: relative;
