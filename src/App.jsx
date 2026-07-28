@@ -1400,8 +1400,9 @@ function App() {
     const bWin = completed && (m.teamB_score ?? -1) > (m.teamA_score ?? -2)
     const statusMap = { COMPLETED: { label: '✅', cls: 'st-done' }, UPCOMING: { label: '⏳', cls: 'st-upcoming' }, PENDING_SOURCE: { label: '⏸', cls: 'st-pending' } }
     const stObj = statusMap[m.status] || statusMap.UPCOMING
+    const gColor = getGroupColor(m.group)
     return (
-      <div className="compact-match compact-match--schedule">
+      <div className="compact-match compact-match--schedule" style={{ borderLeft: `4px solid ${gColor}` }}>
         <div className="compact-match__top">
           <span className="cm-status-pill">{stObj.label}</span>
           {m.label && <span className="compact-match__tag">{m.label}</span>}
