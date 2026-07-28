@@ -193,15 +193,19 @@ function App() {
       if (snap.exists()) setBannerData(snap.data())
     })
 
-    // Load rules config (real-time)
-    const rulesRef = doc(db, 'config', 'rules')
-    const unsubRules = onSnapshot(rulesRef, snap => {
-      if (snap.exists()) {
-        setRulesData(snap.data())
-      } else {
-        setDoc(rulesRef, DEFAULT_RULES).catch(e => console.error('Rules init error:', e))
-      }
-    })
+    // Rules config: luôn dùng DEFAULT_RULES từ code (Firestore rules chặn ghi config/rules,
+    // nên doc cũ trên Firestore không bao giờ cập nhật được → bỏ qua để tránh hiển thị nội dung cũ).
+    // Nếu có doc cũ, xóa 1 lần để không override.
+    ;(async () => {
+      try {
+        const rulesRef = doc(db, 'config', 'rules')
+        const snap = await getDoc(rulesRef)
+        if (snap.exists()) {
+          await deleteDoc(rulesRef).catch(() => {})
+        }
+      } catch (e) { /* bỏ qua */ }
+      setRulesData(DEFAULT_RULES)
+    })()
 
     // Load group names config (real-time)
     const groupNamesRef = doc(db, 'config', 'groupNames')
@@ -269,7 +273,7 @@ function App() {
       }
     }
 
-    return () => { unsubMatches(); unsubBanner(); unsubRules(); unsubGroupNames(); unsubComments(); delete window.simulateTournament }
+    return () => { unsubMatches(); unsubBanner(); unsubGroupNames(); unsubComments(); delete window.simulateTournament }
   }, [])
 
   // Auto-triggers removed to prevent race-condition duplicates.
@@ -1672,8 +1676,8 @@ function App() {
               const standings = computeStandingsForGroup(group)
 
               return (
-                <div key={group} className="group-card">
-                  <h2 className="group-title" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div key={group} className="group-card" style={{ borderTop: `4px solid ${getGroupColor(group)}` }}>
+                  <h2 className="group-title" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: getGroupColor(group) }}>
                     {getGroupDisplayName(group)}
                     {isAdmin && (
                       <button 
@@ -1833,7 +1837,12 @@ function App() {
             {scheduleStageTab === 'group' && (
               <div className="filter-group">
                 {scheduleFilters.map(key => (
-                  <button key={key} className={`btn-clear-option ${scheduleGroupFilter === key ? 'active' : ''}`} onClick={() => setScheduleGroupFilter(key)}>{key === 'ALL' ? 'Tất cả' : `Bảng ${key}`}</button>
+                  <button
+                    key={key}
+                    className={`btn-clear-option ${scheduleGroupFilter === key ? 'active' : ''}`}
+                    style={key !== 'ALL' && scheduleGroupFilter === key ? { background: getGroupColor(key), borderColor: getGroupColor(key), color: '#0f172a' } : undefined}
+                    onClick={() => setScheduleGroupFilter(key)}
+                  >{key === 'ALL' ? 'Tất cả' : `Bảng ${key}`}</button>
                 ))}
               </div>
             )}

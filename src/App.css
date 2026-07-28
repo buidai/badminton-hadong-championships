@@ -792,8 +792,8 @@ body {
 /* ─── Groups Grid ─── */
 .groups-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 18px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
   margin-bottom: 20px;
 }
 
@@ -1535,13 +1535,19 @@ body {
     grid-column: span 2;
   }
   .groups-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
   }
   .info-grid {
     grid-template-columns: 1fr;
   }
   .hero-stats-row {
     flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 520px) {
+  .groups-grid {
+    grid-template-columns: 1fr;
   }
 }
 
