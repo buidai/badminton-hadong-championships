@@ -24,6 +24,7 @@ function App() {
   // Schedule UI state
   const [scheduleGroupFilter, setScheduleGroupFilter] = useState('ALL')
   const [scheduleStageTab, setScheduleStageTab] = useState('group')
+  const [mvpUnvotedOnly, setMvpUnvotedOnly] = useState(false)
 
   // State quản lý việc mở/đóng Modal thông tin tuyển thủ
   const [selectedTeam, setSelectedTeam] = useState(null)
@@ -442,9 +443,25 @@ function App() {
         console.error('Lỗi khi xóa dữ liệu cũ:', err)
       }
 
-      const mockPlayers = Array.from({ length: totalTeams }, (_, i) => {
-        return { p1: `VĐV ${i*2+1}`, p2: `VĐV ${i*2+2}` }
-      })
+      // 16 cặp đôi nam-nữ lấy tên từ giải cầu lông quốc tế (mixed doubles style)
+      const mockPlayers = [
+        ['Viktor Axelsen', 'Chen Qingchen'],
+        ['Anthony Ginting', 'Greysia Polii'],
+        ['Kenta Momota', 'Yuki Fukushima'],
+        ['Lee Zii Jia', 'Lee So Hee'],
+        ['Shi Yu Qi', 'Huang Yaqiong'],
+        ['Anders Antonsen', 'Kim So Yeong'],
+        ['Jonatan Christie', 'Nami Matsuyama'],
+        ['Chou Tien Chen', 'Mayu Matsumoto'],
+        ['Pusarla Sindhu', 'Zheng Si Wei'],
+        ['An Se Young', 'Wang Yi Lyu'],
+        ['Tai Tzu Ying', 'Tang Chun Man'],
+        ['Carolina Marin', 'Seo Seung Jae'],
+        ['Akane Yamaguchi', 'Marcus Gideon'],
+        ['Nozomi Okuhara', 'Kevin Sanjaya'],
+        ['He Bing Jiao', 'Yuta Watanabe'],
+        ['Busanan Ongbamrungphan', 'Hendra Setiawan'],
+      ]
 
       mockPlayers.forEach((p, index) => {
         const groupIndex = Math.floor(index / TEAMS_PER_GROUP)
@@ -453,8 +470,8 @@ function App() {
         batch.set(newTeamRef, {
           name: `Đội ${teamLabel}`,
           teamLabel: teamLabel,
-          player1: p.p1,
-          player2: p.p2,
+          player1: p[0],
+          player2: p[1],
           department: "Phòng ban / Dự án",
           group: groups[groupIndex],
           played: 0, won: 0, lost: 0, points: 0, setDifference: 0, setsFor: 0, setsAgainst: 0
@@ -1464,120 +1481,58 @@ function App() {
   return (
     <div className="app-container">
 
-      {/* Hero Banner */}
-      <div className="hero-banner" style={bannerData.imageUrl ? { backgroundImage: `url(${bannerData.imageUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}>
-        {/* Progress Bar (tính số trận đã hoàn thành) */}
+      {/* Compact Sticky Top Bar (Monitor surface) */}
+      <div className="topbar">
+        <div className="topbar-main">
+          <div className="topbar-title">
+            <span className="hero-live-badge">🏸 LIVE</span>
+            <h1 className="topbar-h1">{bannerData.title || 'HD Badminton Beer Cup 🏸'}</h1>
+            {isAdmin && (
+              <button className="btn-banner-edit" onClick={() => { setBannerForm({...bannerData}); setBannerEditOpen(true) }}>✏️</button>
+            )}
+          </div>
+          <div className="topbar-stats">
+            <div className="tb-stat"><span className="tb-num">{teams.length || '—'}</span><span className="tb-lbl">Đội</span></div>
+            <div className="tb-stat"><span className="tb-num">{Object.keys(groupedTeams).filter(g => groupedTeams[g].length > 0).length || 4}</span><span className="tb-lbl">Bảng</span></div>
+            <div className="tb-stat"><span className="tb-num">{matches.length || 0}</span><span className="tb-lbl">Trận</span></div>
+            <div className="tb-stat"><span className="tb-num">{matches.filter(m => m.status === 'COMPLETED').length}</span><span className="tb-lbl">Xong ✅</span></div>
+          </div>
+        </div>
+        <div className="topbar-right">
+          {/* MVP Realtime mini */}
+          <div className="topbar-mvp">
+            <span className="topbar-mvp-title">⭐ Top MVP 🔴</span>
+            {mvpLeaderboard.length === 0 ? (
+              <span className="mvp-empty-mini">chưa có</span>
+            ) : (
+              <span className="topbar-mvp-lead">{mvpLeaderboard[0][0]} ({mvpLeaderboard[0][1]})</span>
+            )}
+          </div>
+          <div className="hero-auth-btn">
+            {isAdmin ? (
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <span className="badge-admin">👑 Admin</span>
+                <button onClick={handleAdminLogout} className="btn-auth">Đăng xuất</button>
+              </div>
+            ) : (
+              <button onClick={() => setAdminLoginOpen(true)} className="btn-auth">🔐 Admin</button>
+            )}
+          </div>
+        </div>
+        {/* progress bar */}
         {matches.length > 0 && (
-          <div className="tournament-progress">
+          <div className="topbar-progress">
             <div className="progress-bar" style={{ width: `${(matches.filter(m => m.status === 'COMPLETED').length / matches.length) * 100}%` }}></div>
           </div>
         )}
-        {/* SVG shuttlecock backdrop decoration */}
-        <div className="hero-backdrop-svg" aria-hidden="true">
-          <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ position: 'absolute', right: '38%', top: '10%', width: 180, opacity: 0.07 }}>
-            <ellipse cx="100" cy="160" rx="22" ry="10" fill="white"/>
-            <circle cx="100" cy="155" r="12" fill="white"/>
-            <line x1="100" y1="143" x2="60" y2="30" stroke="white" strokeWidth="2.5"/>
-            <line x1="100" y1="143" x2="100" y2="25" stroke="white" strokeWidth="2.5"/>
-            <line x1="100" y1="143" x2="140" y2="30" stroke="white" strokeWidth="2.5"/>
-            <line x1="100" y1="143" x2="75" y2="20" stroke="white" strokeWidth="1.5"/>
-            <line x1="100" y1="143" x2="125" y2="20" stroke="white" strokeWidth="1.5"/>
-            <ellipse cx="100" cy="28" rx="42" ry="14" stroke="white" strokeWidth="1.8" fill="none"/>
-            <ellipse cx="100" cy="34" rx="35" ry="10" stroke="white" strokeWidth="1.2" fill="none"/>
-          </svg>
-        </div>
-        <div className="hero-overlay">
-          {/* Left: Tournament info */}
-          <div className="hero-left">
-            <div className="hero-top-row">
-              <span className="hero-live-badge">🏸 LIVE</span>
-              {isAdmin && (
-                <button className="btn-banner-edit" onClick={() => { setBannerForm({...bannerData}); setBannerEditOpen(true) }}>✏️ Sửa banner</button>
-              )}
-            </div>
-            <h1 className="hero-title">{bannerData.title || 'HD Badminton Beer Cup 🏸'}</h1>
-            <p className="hero-subtitle">{bannerData.subtitle || 'Giải đánh đôi nam-nữ hỗn hợp'}</p>
-            <div className="hero-stats-row">
-              <div className="hero-stat"><span className="hs-num">{teams.length || '—'}</span><span className="hs-label">Đội</span></div>
-              <div className="hero-stat"><span className="hs-num">{Object.keys(groupedTeams).filter(g => groupedTeams[g].length > 0).length || 4}</span><span className="hs-label">Bảng</span></div>
-              <div className="hero-stat"><span className="hs-num">{matches.length || 0}</span><span className="hs-label">Trận</span></div>
-              <div className="hero-stat"><span className="hs-num">{matches.filter(m => m.status === 'COMPLETED').length}</span><span className="hs-label">Xong ✅</span></div>
-            </div>
-            <div className="hero-meme">{todayMeme}</div>
-            {isAdmin && (
-              <div className="hero-admin-actions">
-                <button onClick={generateMockTeams} className="btn-hero-action" disabled={loading}>🎲 Tạo đội mẫu</button>
-                <button onClick={generateSchedule} className="btn-hero-action" disabled={loading}>📅 Tạo lịch vòng bảng</button>
-                <button onClick={generatePhase2AndFinals} className="btn-hero-action" disabled={loading}>🏆 Tạo lượt 2 & chung kết</button>
-                <button onClick={() => setGroupNamesEditOpen(true)} style={{ display: 'none' }}></button>
-              </div>
-            )}
+        {/* admin actions row */}
+        {isAdmin && (
+          <div className="topbar-admin">
+            <button onClick={generateMockTeams} className="btn-hero-action" disabled={loading}>🎲 Tạo đội mẫu</button>
+            <button onClick={generateSchedule} className="btn-hero-action" disabled={loading}>📅 Tạo lịch vòng bảng</button>
+            <button onClick={generatePhase2AndFinals} className="btn-hero-action" disabled={loading}>🏆 Tạo lượt 2 & chung kết</button>
           </div>
-
-          {/* Right: Badminton image + live MVP leaderboard */}
-          <div className="hero-right">
-            <div className="hero-img-wrap">
-              <img
-                src={bannerData.sportImageUrl || 'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=600&q=80'}
-                alt="Badminton"
-                className="hero-sport-img"
-                onError={e => { e.target.style.display = 'none' }}
-              />
-              <div className="hero-img-overlay" />
-            </div>
-
-            {/* MVP Realtime Block — always visible */}
-            <div className="hero-mvp-live">
-              <div className="hero-mvp-title">
-                <span>⭐ Top MVP</span>
-                <span className="mvp-live-badge">🔴 LIVE</span>
-              </div>
-              {mvpLeaderboard.length === 0 ? (
-                <div className="mvp-empty">
-                  <span>Chưa có bình chọn</span>
-                  <span className="mvp-empty-hint">Bình chọn sau mỗi trận xong</span>
-                </div>
-              ) : (
-                <div className="mvp-list">
-                  {mvpLeaderboard.slice(0, 5).map(([player, votes], idx) => (
-                    <div key={player} className={`hero-mvp-item ${idx === 0 ? 'mvp-first' : ''}`}>
-                      <span className="mvp-medal">
-                        {idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx + 1}`}
-                      </span>
-                      <span className="mvp-name">{player}</span>
-                      <div className="mvp-bar-wrap">
-                        <div
-                          className="mvp-bar"
-                          style={{
-                            width: `${Math.round((votes / mvpLeaderboard[0][1]) * 100)}%`,
-                            background: idx === 0
-                              ? 'linear-gradient(90deg,#fbbf24,#f59e0b)'
-                              : idx === 1
-                              ? 'linear-gradient(90deg,#94a3b8,#64748b)'
-                              : 'linear-gradient(90deg,#a16207,#78350f)'
-                          }}
-                        />
-                      </div>
-                      <span className="mvp-votes">{votes}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-      {/* Top-right: admin badge */}
-        <div className="hero-auth-btn">
-          {isAdmin ? (
-            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-              <span className="badge-admin">👑 Admin</span>
-              <button onClick={handleAdminLogout} className="btn-auth">Đăng xuất</button>
-            </div>
-          ) : (
-            <button onClick={() => setAdminLoginOpen(true)} className="btn-auth">🔐 Admin</button>
-          )}
-        </div>
+        )}
       </div>
 
       {/* Collapsible Thể lệ panel under the banner */}
@@ -1839,6 +1794,12 @@ function App() {
             <div className="stage-tabs">
               <button className={`btn-tab ${scheduleStageTab === 'group' ? 'active' : ''}`} onClick={() => setScheduleStageTab('group')}>Vòng bảng</button>
               <button className={`btn-tab ${scheduleStageTab === 'bracket' ? 'active' : ''}`} onClick={() => setScheduleStageTab('bracket')}>Sơ đồ vòng loại (Lượt 2 & 3)</button>
+              <button
+                className={`btn-tab ${mvpUnvotedOnly ? 'active' : ''}`}
+                onClick={() => setMvpUnvotedOnly(v => !v)}
+                title="Chỉ hiển thị các trận đã kết thúc mà bạn chưa bình chọn MVP"
+                style={{ marginLeft: 'auto' }}
+              >⭐ Chưa vote MVP</button>
             </div>
             {scheduleStageTab === 'group' && (
               <div className="filter-group">
@@ -1870,7 +1831,10 @@ function App() {
             <div className="match-list">
               {scheduleStageTab === 'group' ? (
                 <div style={{ display: 'grid', gap: 8 }}>
-                  {groupStageMatches.map(m => renderCompactScheduleMatch(m))}
+                  {groupStageMatches.filter(m => !mvpUnvotedOnly || (m.status === 'COMPLETED' && !myVotes[m.id])).map(m => renderCompactScheduleMatch(m))}
+                  {mvpUnvotedOnly && groupStageMatches.filter(m => !mvpUnvotedOnly || (m.status === 'COMPLETED' && !myVotes[m.id])).length === 0 && (
+                    <div className="empty-state-card"><p>🎉 Bạn đã vote MVP cho tất cả trận vòng bảng đã kết thúc!</p></div>
+                  )}
                 </div>
               ) : (
                 <div className="bracket-v2">
@@ -1878,9 +1842,9 @@ function App() {
                     const groupTitle = rg === 1 ? "🏆 Tranh hạng 1-4" : rg === 2 ? "🎖️ Tranh hạng 5-8" : rg === 3 ? "🎯 Tranh hạng 9-12" : "🛡️ Tranh hạng 13-16"
                     const groupSub = rg === 1 ? "Nhất các bảng" : rg === 2 ? "Nhì các bảng" : rg === 3 ? "Hạng 3 các bảng" : "Bét các bảng"
                     const groupColor = rg === 1 ? '#fbbf24' : rg === 2 ? '#22c55e' : rg === 3 ? '#f59e0b' : '#a855f7'
-                    const sf = phase2Matches.filter(m => m.rankGroup === rg).sort((a,b) => a.matchOrder - b.matchOrder)
+                    const sf = phase2Matches.filter(m => m.rankGroup === rg && (!mvpUnvotedOnly || (m.status === 'COMPLETED' && !myVotes[m.id]))).sort((a,b) => a.matchOrder - b.matchOrder)
                     const baseRank = (rg - 1) * 4 + 1
-                    const finals = finalMatches.filter(m => m.rankWinner === baseRank || m.rankWinner === baseRank + 2).sort((a,b) => a.rankWinner - b.rankWinner)
+                    const finals = finalMatches.filter(m => (m.rankWinner === baseRank || m.rankWinner === baseRank + 2) && (!mvpUnvotedOnly || (m.status === 'COMPLETED' && !myVotes[m.id]))).sort((a,b) => a.rankWinner - b.rankWinner)
                     const topFinal = finals.find(m => m.rankWinner === baseRank)
                     const lowFinal = finals.find(m => m.rankWinner === baseRank + 2)
                     const overall = computeOverallStandings()

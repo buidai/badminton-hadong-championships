@@ -36,22 +36,22 @@ async function seed() {
   console.log('\n👥 Creating 16 mock teams (4 groups × 4 teams)...')
   const groups = ['A', 'B', 'C', 'D']
   const players = [
-    ['VĐV 1', 'VĐV 2'],     // A1
-    ['VĐV 3', 'VĐV 4'],     // A2
-    ['VĐV 5', 'VĐV 6'],     // A3
-    ['VĐV 7', 'VĐV 8'],     // A4
-    ['VĐV 9', 'VĐV 10'],    // B1
-    ['VĐV 11', 'VĐV 12'],   // B2
-    ['VĐV 13', 'VĐV 14'],   // B3
-    ['VĐV 15', 'VĐV 16'],   // B4
-    ['VĐV 17', 'VĐV 18'],   // C1
-    ['VĐV 19', 'VĐV 20'],   // C2
-    ['VĐV 21', 'VĐV 22'],   // C3
-    ['VĐV 23', 'VĐV 24'],   // C4
-    ['VĐV 25', 'VĐV 26'],   // D1
-    ['VĐV 27', 'VĐV 28'],   // D2
-    ['VĐV 29', 'VĐV 30'],   // D3
-    ['VĐV 31', 'VĐV 32'],   // D4
+    ['Viktor Axelsen', 'Chen Qingchen'],          // A1
+    ['Anthony Ginting', 'Greysia Polii'],         // A2
+    ['Kenta Momota', 'Yuki Fukushima'],           // A3
+    ['Lee Zii Jia', 'Lee So Hee'],                // A4
+    ['Shi Yu Qi', 'Huang Yaqiong'],               // B1
+    ['Anders Antonsen', 'Kim So Yeong'],          // B2
+    ['Jonatan Christie', 'Nami Matsuyama'],       // B3
+    ['Chou Tien Chen', 'Mayu Matsumoto'],         // B4
+    ['Pusarla Sindhu', 'Zheng Si Wei'],           // C1
+    ['An Se Young', 'Wang Yi Lyu'],               // C2
+    ['Tai Tzu Ying', 'Tang Chun Man'],            // C3
+    ['Carolina Marin', 'Seo Seung Jae'],          // C4
+    ['Akane Yamaguchi', 'Marcus Gideon'],         // D1
+    ['Nozomi Okuhara', 'Kevin Sanjaya'],          // D2
+    ['He Bing Jiao', 'Yuta Watanabe'],            // D3
+    ['Busanan Ongbamrungphan', 'Hendra Setiawan'],// D4
   ]
 
   const batch1 = writeBatch(db)
