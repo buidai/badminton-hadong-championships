@@ -263,6 +263,37 @@ console.log('\n🔵 TEST: MVP vote merge (accumulates across users)')
   assert(canVote('m1') === false, 'Đã vote → chặn vote lại')
 }
 
+// ===== TEST: Bracket (Lượt 2/3) không bị filter Bảng A/B/C/D của tab vòng bảng =====
+console.log('\n🔵 TEST: Bracket independent of vòng bảng group filter')
+{
+  const sortedMatches = [
+    { id: 'g1', stage: 'GROUP_STAGE', group: 'A', matchOrder: 1 },
+    { id: 'g2', stage: 'GROUP_STAGE', group: 'B', matchOrder: 2 },
+    { id: 'p1', stage: 'PHASE2', group: 'PHASE2', rankGroup: 1, matchOrder: 25 },
+    { id: 'f1', stage: 'FINAL', group: 'PHASE2', rankWinner: 1, matchOrder: 33 },
+  ]
+  // replicate component filter logic
+  const filterFor = (scheduleGroupFilter) => sortedMatches.filter(m => {
+    if (scheduleGroupFilter === 'ALL') return true
+    return scheduleGroupFilter === 'PHASE2' ? m.group === 'PHASE2' : m.group === scheduleGroupFilter
+  })
+  const groupStageMatches = (f) => f.filter(m => m.stage === 'GROUP_STAGE')
+  const phase2Matches = (src) => src.filter(m => m.stage === 'PHASE2')
+  const finalMatches = (src) => src.filter(m => m.stage === 'FINAL')
+
+  // Khi đang lọc Bảng A mà chuyển sang tab bracket:
+  const filteredA = filterFor('A')
+  // BUG cũ: phase2/final lấy từ filteredA -> rỗng
+  const buggyPhase2 = phase2Matches(filteredA)
+  assert(buggyPhase2.length === 0, 'BUG cũ: lọc Bảng A làm mất trận Lượt 2 (0 trận)')
+  // FIX mới: phase2/final lấy từ sortedMatches (toàn bộ) -> vẫn có
+  const fixedPhase2 = phase2Matches(sortedMatches)
+  const fixedFinal = finalMatches(sortedMatches)
+  assert(fixedPhase2.length === 1 && fixedFinal.length === 1, 'FIX: Lượt 2 & Chung kết vẫn hiện dù đang lọc Bảng A')
+  // vòng bảng vẫn bị lọc đúng
+  assert(groupStageMatches(filteredA).length === 1, 'Vòng bảng vẫn lọc đúng theo Bảng A')
+}
+
 // ===== SUMMARY =====
 console.log(`\n${'='.repeat(50)}`)
 console.log(`📊 KẾT QUẢ: ${passed} passed, ${failed} failed`)

@@ -417,8 +417,9 @@ function App() {
     return scheduleGroupFilter === 'PHASE2' ? m.group === 'PHASE2' : m.group === scheduleGroupFilter
   })
   const groupStageMatches = filteredMatches.filter(m => m.stage === 'GROUP_STAGE')
-  const phase2Matches = filteredMatches.filter(m => m.stage === 'PHASE2')
-  const finalMatches = filteredMatches.filter(m => m.stage === 'FINAL')
+  // Lượt 2/3 (bracket) KHÔNG bị ảnh hưởng bởi filter Bảng A/B/C/D của tab vòng bảng
+  const phase2Matches = sortedMatches.filter(m => m.stage === 'PHASE2')
+  const finalMatches = sortedMatches.filter(m => m.stage === 'FINAL')
 
   // 1. TẠO DATA CÓ THÊM THÔNG TIN (Dùng tên chung chung làm ví dụ)
   const generateMockTeams = async () => {
