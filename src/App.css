@@ -1416,6 +1416,39 @@ body {
   .hero-stats-row {
     flex-wrap: wrap;
   }
+  .bracket-container {
+    justify-content: flex-start;
+    padding-left: 10px;
+    padding-right: 10px;
+    gap: 30px;
+  }
+  .bracket-match {
+    min-width: 260px;
+  }
+  .bracket-col:nth-child(1) .bracket-match:first-child::after {
+    width: 15px;
+    right: -15px;
+  }
+  .bracket-col:nth-child(2) .bracket-match::before {
+    width: 15px;
+    left: -15px;
+  }
+  .bracket-col:nth-child(2) .bracket-match::after {
+    width: 15px;
+    right: -15px;
+  }
+  .bracket-result-group .bracket-result-card:first-child::before {
+    width: 15px;
+    left: -15px;
+  }
+  .bracket-fork-stem {
+    width: 15px;
+    right: -15px;
+  }
+  .bracket-fork {
+    width: 15px;
+    right: -30px;
+  }
 }
 
 @media (max-width: 480px) {

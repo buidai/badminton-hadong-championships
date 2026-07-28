@@ -9,7 +9,7 @@ function App() {
   const [loading, setLoading] = useState(false)
   
   // Tab state: 'groups', 'groupStandings', 'overall', 'schedule', or 'rules'
-  const [currentTab, setCurrentTab] = useState('groups')
+  const [currentTab, setCurrentTab] = useState('groupStandings')
   // Local scores inputs for schedule view
   const [localScores, setLocalScores] = useState({})
 
@@ -1542,8 +1542,7 @@ function App() {
       {/* Tabs */}
       <div className="main-tabs-bar">
         {[
-          { key: 'groups', label: '🏠 Bảng đấu' },
-          { key: 'groupStandings', label: '📊 Xếp hạng bảng' },
+          { key: 'groupStandings', label: '📊 Bảng đấu' },
           { key: 'overall', label: '🏆 Chung cuộc' },
           { key: 'schedule', label: '📅 Lịch thi đấu' },
           { key: 'rules', label: '📋 Thể lệ' },
@@ -1565,7 +1564,16 @@ function App() {
 
               return (
                 <div key={group} className="group-card">
-                  <h2 className="group-title">{getGroupDisplayName(group)}</h2>
+                  <h2 className="group-title" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    {getGroupDisplayName(group)}
+                    {isAdmin && (
+                      <button 
+                        onClick={() => { setGroupNamesForm({...groupNames}); setGroupNamesEditOpen(true) }} 
+                        style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '1rem', padding: 0 }}
+                        title="Đổi tên bảng"
+                      >✏️</button>
+                    )}
+                  </h2>
                   <div className="standings-wrapper">
                     <table className="standings-table">
                       <thead>
@@ -1602,48 +1610,16 @@ function App() {
                       </tbody>
                     </table>
                   </div>
+                  {isAdmin && (
+                    <div style={{ marginTop: 15 }}>
+                      <button className="btn-primary" style={{ padding: '10px 16px', width: 'fit-content' }} onClick={() => openAddTeamModal(group)}>
+                        + Thêm đội vào bảng {group}
+                      </button>
+                    </div>
+                  )}
                 </div>
               )
             })}
-        </div>
-      )}
- 
-      {/** Group Teams Overview View */}
-      {currentTab === 'groups' && (
-        <div className="groups-grid">
-          {['A','B','C','D'].map(group => (
-            <div key={group} className="group-card">
-              <h2 className="group-title" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                {getGroupDisplayName(group)}
-                {isAdmin && (
-                  <button 
-                    onClick={() => { setGroupNamesForm({...groupNames}); setGroupNamesEditOpen(true) }} 
-                    style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '1rem', padding: 0 }}
-                    title="Đổi tên bảng"
-                  >✏️</button>
-                )}
-              </h2>
-              <div style={{ display: 'grid', gap: 10 }}>
-                {(groupedTeams[group] || []).map(team => (
-                  <div key={team.id} className="team-card" style={{ borderLeft: `4px solid ${getGroupColor(group)}`, background: hexToRgba(getGroupColor(group), 0.10), cursor: isAdmin ? 'pointer' : 'default' }} onClick={() => isAdmin && handleOpenEditModal(team)}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                      <TeamLogo team={team} size={44} />
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontWeight: 700, color: '#e2e8f0', fontSize: '0.97rem', marginBottom: 2 }}>{team.name}</div>
-                        <div style={{ color: '#64748b', fontSize: '0.82rem' }}>{team.player1 || '---'} &amp; {team.player2 || '---'}</div>
-                      </div>
-                      {isAdmin && <span style={{ fontSize: '0.72rem', color: '#475569' }}>✏️</span>}
-                    </div>
-                  </div>
-                ))}
-                {isAdmin && (
-                <button className="btn-primary" style={{ justifySelf: 'start', padding: '14px 18px', width: 'fit-content' }} onClick={() => openAddTeamModal(group)}>
-                  + Thêm đội vào bảng {group}
-                </button>
-                )}
-              </div>
-            </div>
-          ))}
         </div>
       )}
  
