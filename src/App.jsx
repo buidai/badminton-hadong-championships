@@ -146,6 +146,7 @@ function App() {
 
   const [rulesData, setRulesData] = useState(DEFAULT_RULES)
   const [rulesEditOpen, setRulesEditOpen] = useState(false)
+  const [rulesOpen, setRulesOpen] = useState(false)
   const [rulesForm, setRulesForm] = useState(DEFAULT_RULES)
 
   // Comments
@@ -1398,9 +1399,10 @@ function App() {
   const renderCompactMatch = (m, tag) => {
     const completed = m.status === 'COMPLETED'
     const aWin = completed && m.teamA_score > m.teamB_score
-    const bWin = completed && m.teamB_score > m.teamA_score
+    const bWin = completed && m.teamB_score > m.teamB_score
+    const locked = m.status === 'PENDING_SOURCE'
     return (
-      <div className="compact-match">
+      <div className={`compact-match ${locked ? 'compact-match--locked' : ''}`}>
         {tag && <div className="compact-match__tag">{tag}</div>}
         <div className={`cm-team ${aWin ? 'cm-win' : ''}`}>
           <span className="cm-name">{m.teamA_name || '?'}</span>
@@ -1411,6 +1413,9 @@ function App() {
           <span className="cm-name">{m.teamB_name || '?'}</span>
           {completed && <span className="cm-score">{m.teamB_score}</span>}
         </div>
+        {isAdmin && !locked && (
+          <button className="cm-edit" onClick={() => openMatchEditModal(m)} title="Sửa / nhập tỉ số">✏️</button>
+        )}
       </div>
     )
   }
@@ -1534,6 +1539,44 @@ function App() {
         </div>
       </div>
 
+      {/* Collapsible Thể lệ panel under the banner */}
+      <div className="rules-panel">
+        <button className="rules-toggle" onClick={() => setRulesOpen(o => !o)}>
+          <span>📋 Thể lệ giải đấu</span>
+          <span className={`rules-chevron ${rulesOpen ? 'open' : ''}`}>{rulesOpen ? '▲' : '▼'}</span>
+        </button>
+        {rulesOpen && (
+          <div className="rules-panel-body">
+            <div className="info-grid">
+              {(rulesData.sections || []).map((sec, sIdx) => (
+                <div
+                  key={sec.id || sIdx}
+                  className="rule-box"
+                  style={{
+                    '--rule-accent-color': sec.color || '#38bdf8',
+                    gridColumn: (sec.title && sec.title.includes('MVP')) ? '1 / -1' : 'auto'
+                  }}
+                >
+                  <h3 style={{ color: sec.color || '#38bdf8' }}>{sec.title}</h3>
+                  <ul>
+                    {(sec.items || []).map((item, idx) => (
+                      <li key={idx}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+            {isAdmin && (
+              <div style={{ textAlign: 'center', marginTop: 14 }}>
+                <button className="btn-primary" onClick={handleOpenRulesEdit} style={{ background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)', color: '#0f172a' }}>
+                  ✏️ Chỉnh sửa thể lệ (Admin)
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
       {/* Comments Section – below hero banner */}
       <div className="comments-section">
         <div className="cs-inner">
@@ -1577,11 +1620,10 @@ function App() {
           { key: 'groupStandings', label: '📊 Bảng đấu' },
           { key: 'overall', label: '🏆 Chung cuộc' },
           { key: 'schedule', label: '📅 Lịch thi đấu' },
-          { key: 'rules', label: '📋 Thể lệ' },
         ].map(({ key, label }) => (
           <button
             key={key}
-            onClick={() => { setCurrentTab(key); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
+            onClick={() => setCurrentTab(key)}
             className={`main-tab-btn ${currentTab === key ? 'active' : ''}`}
           >{label}</button>
         ))}
@@ -1750,8 +1792,8 @@ function App() {
           <h2 style={{ color: '#cbd5e1', marginBottom: 8 }}>Lịch Thi Đấu</h2>
           <div className="schedule-controls">
             <div className="stage-tabs">
-              <button className={`btn-tab ${scheduleStageTab === 'group' ? 'active' : ''}`} onClick={() => { setScheduleStageTab('group'); window.scrollTo({ top: 0, behavior: 'smooth' }) }}>Vòng bảng</button>
-              <button className={`btn-tab ${scheduleStageTab === 'bracket' ? 'active' : ''}`} onClick={() => { setScheduleStageTab('bracket'); window.scrollTo({ top: 0, behavior: 'smooth' }) }}>Sơ đồ vòng loại (Lượt 2 & 3)</button>
+              <button className={`btn-tab ${scheduleStageTab === 'group' ? 'active' : ''}`} onClick={() => setScheduleStageTab('group')}>Vòng bảng</button>
+              <button className={`btn-tab ${scheduleStageTab === 'bracket' ? 'active' : ''}`} onClick={() => setScheduleStageTab('bracket')}>Sơ đồ vòng loại (Lượt 2 & 3)</button>
             </div>
             {scheduleStageTab === 'group' && (
               <div className="filter-group">
@@ -1809,7 +1851,7 @@ function App() {
                             <div className="bracket-col-c__head">⚔️ Lượt 2</div>
                             <div className="bracket-col-c__body">
                               {sf.map((m, idx) => (
-                                <div key={m.id}>{renderCompactMatch(m)}</div>
+                                <div key={m.id}>{renderCompactMatch(m, `Trận ${idx + 1}`)}</div>
                               ))}
                             </div>
                           </div>
@@ -1852,44 +1894,6 @@ function App() {
               )}
             </div>
           )}
-        </div>
-      )}
-
-      {currentTab === 'rules' && (
-        <div style={{ maxWidth: 1080, margin: '24px auto', padding: '0 12px' }}>
-          <div className="info-card">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 12 }}>
-              <div>
-                <h2 style={{ color: '#fbbf24', margin: 0, fontSize: '1.8rem' }}>{rulesData.title || '📋 Thể lệ giải đấu'}</h2>
-                <p style={{ color: '#94a3b8', marginTop: 4 }}>{rulesData.subtitle || 'HD Badminton Beer Cup — Giải cầu lông đánh đôi nam-nữ hỗn hợp'}</p>
-              </div>
-              {isAdmin && (
-                <button className="btn-primary" onClick={handleOpenRulesEdit} style={{ background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)', color: '#0f172a' }}>
-                  ✏️ Chỉnh sửa thể lệ (Admin)
-                </button>
-              )}
-            </div>
-
-            <div className="info-grid">
-              {(rulesData.sections || []).map((sec, sIdx) => (
-                <div 
-                  key={sec.id || sIdx} 
-                  className="rule-box" 
-                  style={{ 
-                    '--rule-accent-color': sec.color || '#38bdf8',
-                    gridColumn: (sec.title && sec.title.includes('MVP')) ? '1 / -1' : 'auto' 
-                  }}
-                >
-                  <h3 style={{ color: sec.color || '#38bdf8' }}>{sec.title}</h3>
-                  <ul>
-                    {(sec.items || []).map((item, idx) => (
-                      <li key={idx}>{item}</li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
       )}
 
