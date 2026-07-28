@@ -654,10 +654,43 @@ function App() {
       return sb > sa ? 1 : sb < sa ? -1 : 0
     }
 
-    return Object.values(map).sort((a, b) => {
+    // Xếp hạng: 1) Điểm, 2) Đối đầu (chỉ 2 đội bằng điểm), 3) Hiệu số điểm
+    // Khi 3 đội bằng điểm VÀ H2H vòng tròn → bỏ qua H2H, dùng hiệu số
+    const teamsList = Object.values(map)
+
+    // Nhóm đội theo điểm để detect circular H2H
+    const pointsGroups = {}
+    teamsList.forEach(t => {
+      const key = t.points || 0
+      if (!pointsGroups[key]) pointsGroups[key] = []
+      pointsGroups[key].push(t.id)
+    })
+
+    // Kiểm tra circular H2H trong nhóm: nếu MỌI đội đều thắng 1 đội khác trong nhóm
+    const isCircularH2H = (teamIds) => {
+      if (teamIds.length <= 2) return false
+      // Circular khi mỗi đội thắng ít nhất 1 đội khác trong nhóm VÀ thua ít nhất 1
+      for (const tid of teamIds) {
+        const winsInGroup = teamIds.filter(oid => oid !== tid && getH2H(tid, oid) === 1).length
+        const lossInGroup = teamIds.filter(oid => oid !== tid && getH2H(tid, oid) === -1).length
+        if (winsInGroup === 0 || lossInGroup === 0) return false
+      }
+      return true
+    }
+
+    // Build set of circular groups
+    const circularPointsKeys = new Set()
+    Object.entries(pointsGroups).forEach(([pts, ids]) => {
+      if (isCircularH2H(ids)) circularPointsKeys.add(Number(pts))
+    })
+
+    return teamsList.sort((a, b) => {
       if ((b.points || 0) !== (a.points || 0)) return (b.points || 0) - (a.points || 0)
-      const h2h = getH2H(a.id, b.id)
-      if (h2h !== 0) return -h2h // a beat b → a first (return negative)
+      // Nếu nhóm điểm này là circular H2H → skip H2H, dùng hiệu số
+      if (!circularPointsKeys.has(a.points || 0)) {
+        const h2h = getH2H(a.id, b.id)
+        if (h2h !== 0) return -h2h // a beat b → a first (return negative)
+      }
       if ((b.setDifference || 0) !== (a.setDifference || 0)) return (b.setDifference || 0) - (a.setDifference || 0)
       return (a.name || '').localeCompare(b.name || '')
     })
