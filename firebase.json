@@ -1,5 +1,6 @@
 {
   "hosting": {
+    "site": "badminton-hadong-championships",
     "public": "dist",
     "ignore": [
       "firebase.json",
