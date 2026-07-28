@@ -88,12 +88,12 @@ function App() {
         title: '🥊 Lượt 2 — Phân hạng',
         color: '#22c55e',
         items: [
-          '16 đội chia 4 nhóm theo thứ hạng bảng:',
-          '• Nhóm 1: 4 đội NHẤT (A1, B1, C1, D1) → tranh hạng 1–4',
-          '• Nhóm 2: 4 đội NHÌ (A2, B2, C2, D2) → tranh hạng 5–8',
-          '• Nhóm 3: 4 đội HẠNG 3 (A3, B3, C3, D3) → tranh hạng 9–12',
-          '• Nhóm 4: 4 đội BÉT (A4, B4, C4, D4) → tranh hạng 13–16',
-          'Cặp đấu Lượt 2 (trực tiếp): Nhất A gặp Nhất D, Nhất B gặp Nhất C (tương tự các nhóm 2, 3, 4).'
+          'Kết thúc vòng bảng, 16 đội được chia làm 4 nhóm theo thứ hạng mỗi bảng:',
+          '• Nhóm Hạng Nhất (A1, B1, C1, D1) → tranh hạng 1–4',
+          '• Nhóm Hạng Nhì (A2, B2, C2, D2) → tranh hạng 5–8',
+          '• Nhóm Hạng Ba (A3, B3, C3, D3) → tranh hạng 9–12',
+          '• Nhóm Hạng Bét (A4, B4, C4, D4) → tranh hạng 13–16',
+          'Lượt 2 (loại trực tiếp): Nhất A gặp Nhất D, Nhất B gặp Nhất C (tương tự các nhóm 2, 3, 4). Thắng đi tiếp, thua xuống tranh hạng thấp.'
         ]
       },
       {
@@ -101,12 +101,9 @@ function App() {
         title: '🏆 Lượt 3 — Chung kết phân hạng',
         color: '#f97316',
         items: [
-          'Mỗi nhóm: 2 đội THẮNG Lượt 2 gặp nhau tranh hạng cao, 2 đội THUA gặp nhau tranh hạng thấp.',
-          'Nhóm 1: Thắng↔Thắng → Hạng 1–2 · Thua↔Thua → Hạng 3–4',
-          'Nhóm 2: Thắng↔Thắng → Hạng 5–6 · Thua↔Thua → Hạng 7–8',
-          'Nhóm 3: Thắng↔Thắng → Hạng 9–10 · Thua↔Thua → Hạng 11–12',
-          'Nhóm 4: Thắng↔Thắng → Hạng 13–14 · Thua↔Thua → Hạng 15–16',
-          'Lượt 2 & Lượt 3: CHỈ tính thắng/thua (không cộng điểm) — xếp hạng theo nhóm rơi vào.'
+          'Mỗi nhóm, 2 đội thắng Lượt 2 gặp nhau tranh hạng cao, 2 đội thua gặp nhau tranh hạng thấp.',
+          'Kết quả: Nhóm 1 → Hạng 1–2 / 3–4 · Nhóm 2 → Hạng 5–6 / 7–8 · Nhóm 3 → Hạng 9–10 / 11–12 · Nhóm 4 → Hạng 13–14 / 15–16.',
+          'Lượt 2 & Lượt 3 chỉ tính thắng/thua (không cộng điểm) — xếp hạng theo nhóm rơi vào.'
         ]
       },
       {
