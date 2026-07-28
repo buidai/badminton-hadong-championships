@@ -12,21 +12,21 @@ function assert(cond, msg) {
 }
 
 // ===== TEST 1: Round-Robin Pattern =====
-console.log('\n🔵 TEST 1: Round-Robin Pattern (3 teams/group)')
+console.log('\n🔵 TEST 1: Round-Robin Pattern (4 teams/group)')
 {
-  const pattern3 = [
-    { pA: 0, pB: 1, round: 1 },
-    { pA: 1, pB: 2, round: 2 },
-    { pA: 0, pB: 2, round: 3 }
+  const pattern4 = [
+    { pA: 0, pB: 1, round: 1 }, { pA: 2, pB: 3, round: 1 },
+    { pA: 0, pB: 2, round: 2 }, { pA: 1, pB: 3, round: 2 },
+    { pA: 0, pB: 3, round: 3 }, { pA: 1, pB: 2, round: 3 }
   ]
-  assert(pattern3.length === 3, '3 đội → 3 trận/bảng')
+  assert(pattern4.length === 6, '4 đội → 6 trận/bảng')
 
-  const counts = [0, 0, 0]
-  pattern3.forEach(({ pA, pB }) => { counts[pA]++; counts[pB]++ })
-  assert(counts[0] === 2 && counts[1] === 2 && counts[2] === 2, 'Mỗi đội đấu đúng 2 trận')
+  const counts = [0, 0, 0, 0]
+  pattern4.forEach(({ pA, pB }) => { counts[pA]++; counts[pB]++ })
+  assert(counts[0] === 3 && counts[1] === 3 && counts[2] === 3 && counts[3] === 3, 'Mỗi đội đấu đúng 3 trận')
 
-  const totalGroupMatches = 4 * pattern3.length
-  assert(totalGroupMatches === 12, '4 bảng × 3 trận = 12 trận vòng bảng')
+  const totalGroupMatches = 4 * pattern4.length
+  assert(totalGroupMatches === 24, '4 bảng × 6 trận = 24 trận vòng bảng')
 }
 
 // ===== TEST 2: Label Assignment =====
@@ -36,13 +36,13 @@ console.log('\n🔵 TEST 2: Match Labels')
   let matchCount = 0
   const labels = []
   groups.forEach(() => {
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 6; i++) {
       matchCount++
       labels.push(matchCount)
     }
   })
-  assert(labels.length === 12, '12 trận vòng bảng có label')
-  assert(labels[0] === 1 && labels[11] === 12, 'Label từ 1 đến 12')
+  assert(labels.length === 24, '24 trận vòng bảng có label')
+  assert(labels[0] === 1 && labels[23] === 24, 'Label từ 1 đến 24')
 }
 
 // ===== TEST 3: H2H Tiebreaker =====
@@ -141,42 +141,40 @@ console.log('\n🔵 TEST 4: H2H 2 Teams Tied')
 }
 
 // ===== TEST 5: Phase 2 Pairing =====
-console.log('\n🔵 TEST 5: Phase 2 Pairing Logic')
+console.log('\n🔵 TEST 5: Phase 2 Pairing Logic (16 teams)')
 {
-  const pairings = [
-    { label: 13, a_rank: 3, a_group: 'A', b_rank: 3, b_group: 'D' },
-    { label: 14, a_rank: 3, a_group: 'B', b_rank: 3, b_group: 'C' },
-    { label: 15, a_rank: 2, a_group: 'A', b_rank: 2, b_group: 'D' },
-    { label: 16, a_rank: 2, a_group: 'B', b_rank: 2, b_group: 'C' },
-    { label: 17, a_rank: 1, a_group: 'A', b_rank: 1, b_group: 'D' },
-    { label: 18, a_rank: 1, a_group: 'B', b_rank: 1, b_group: 'C' }
-  ]
-  assert(pairings.length === 6, '6 trận Lượt 2')
-  assert(pairings[0].a_group === 'A' && pairings[0].b_group === 'D', 'T13: Bét A ↔ Bét D')
-  assert(pairings[1].a_group === 'B' && pairings[1].b_group === 'C', 'T14: Bét B ↔ Bét C')
-  assert(pairings[4].a_rank === 1, 'T17: Nhất bảng A ↔ Nhất bảng D')
+  // For 4 teams per group, Phase 2 generates matches for Rank 4 to Rank 1.
+  const pairings = []
+  let labelCounter = 24
+  for (let rank = 4; rank >= 1; rank--) {
+    pairings.push({ label: ++labelCounter, rank, pair: 'AD' })
+    pairings.push({ label: ++labelCounter, rank, pair: 'BC' })
+  }
+  assert(pairings.length === 8, '8 trận Lượt 2 (Phase 2)')
+  assert(pairings[0].pair === 'AD' && pairings[0].rank === 4, 'T25: Bét A ↔ Bét D')
+  assert(pairings[1].pair === 'BC' && pairings[1].rank === 4, 'T26: Bét B ↔ Bét C')
+  assert(pairings[6].rank === 1 && pairings[6].pair === 'AD', 'T31: Nhất bảng A ↔ Nhất bảng D')
 }
 
 // ===== TEST 6: Final Ranking Map =====
-console.log('\n🔵 TEST 6: Final Ranking Map')
+console.log('\n🔵 TEST 6: Final Ranking Map (Dynamic 16 teams)')
 {
-  const finalRankMap = {
-    23: [1, 2],
-    24: [3, 4],
-    21: [5, 6],
-    22: [7, 8],
-    19: [9, 10],
-    20: [11, 12]
+  const finals = []
+  let labelCounter = 32
+  for (let rank = 4; rank >= 1; rank--) {
+    const baseRank = (rank - 1) * 4 + 1
+    finals.push({ label: ++labelCounter, rankWinner: baseRank, rankLoser: baseRank + 1 })
+    finals.push({ label: ++labelCounter, rankWinner: baseRank + 2, rankLoser: baseRank + 3 })
   }
 
-  assert(finalRankMap[23][0] === 1, 'T23 winner → Hạng 1')
-  assert(finalRankMap[23][1] === 2, 'T23 loser → Hạng 2')
-  assert(finalRankMap[20][0] === 11, 'T20 winner → Hạng 11')
-  assert(finalRankMap[20][1] === 12, 'T20 loser → Hạng 12')
+  assert(finals.find(f => f.label === 39).rankWinner === 1, 'T39 winner → Hạng 1')
+  assert(finals.find(f => f.label === 39).rankLoser === 2, 'T39 loser → Hạng 2')
+  assert(finals.find(f => f.label === 34).rankWinner === 15, 'T34 winner → Hạng 15')
+  assert(finals.find(f => f.label === 34).rankLoser === 16, 'T34 loser → Hạng 16')
 
-  const allRanks = Object.values(finalRankMap).flat().sort((a, b) => a - b)
-  assert(allRanks.length === 12, '12 vị trí xếp hạng')
-  assert(JSON.stringify(allRanks) === JSON.stringify([1,2,3,4,5,6,7,8,9,10,11,12]), 'Đầy đủ hạng 1-12')
+  const allRanks = finals.flatMap(f => [f.rankWinner, f.rankLoser]).sort((a, b) => a - b)
+  assert(allRanks.length === 16, '16 vị trí xếp hạng')
+  assert(JSON.stringify(allRanks) === JSON.stringify(Array.from({length: 16}, (_, i) => i + 1)), 'Đầy đủ hạng 1-16')
 }
 
 // ===== TEST 7: Overall Standings with finalRank =====
@@ -219,13 +217,13 @@ console.log('\n🔵 TEST 8: Dependent Match Resolution Logic')
 }
 
 // ===== TEST 9: Total Match Count =====
-console.log('\n🔵 TEST 9: Tổng số trận')
+console.log('\n🔵 TEST 9: Tổng số trận (16 teams)')
 {
-  const groupStage = 4 * 3
-  const phase2 = 6
-  const finals = 6
+  const groupStage = 4 * 6
+  const phase2 = 8
+  const finals = 8
   const total = groupStage + phase2 + finals
-  assert(total === 24, 'Tổng 24 trận (12 + 6 + 6)')
+  assert(total === 40, 'Tổng 40 trận (24 + 8 + 8)')
 }
 
 // ===== SUMMARY =====

@@ -51,6 +51,12 @@ function App() {
   const [bannerEditOpen, setBannerEditOpen] = useState(false)
   const [bannerForm, setBannerForm] = useState({})
 
+  // Group names config (admin editable)
+  const DEFAULT_GROUP_NAMES = { A: 'Bảng A', B: 'Bảng B', C: 'Bảng C', D: 'Bảng D' }
+  const [groupNames, setGroupNames] = useState(DEFAULT_GROUP_NAMES)
+  const [groupNamesEditOpen, setGroupNamesEditOpen] = useState(false)
+  const [groupNamesForm, setGroupNamesForm] = useState(DEFAULT_GROUP_NAMES)
+
   // Rules config (admin editable)
   const DEFAULT_RULES = {
     title: '📋 Thể lệ giải đấu',
@@ -191,6 +197,12 @@ function App() {
       }
     })
 
+    // Load group names config (real-time)
+    const groupNamesRef = doc(db, 'config', 'groupNames')
+    const unsubGroupNames = onSnapshot(groupNamesRef, snap => {
+      if (snap.exists()) setGroupNames(prev => ({ ...prev, ...snap.data() }))
+    })
+
     // Load comments (real-time, newest first)
     let unsubComments = () => {}
     try {
@@ -202,7 +214,7 @@ function App() {
       })
     } catch(e) { console.error('comments listener:', e) }
 
-    return () => { unsubMatches(); unsubBanner(); unsubRules(); unsubComments() }
+    return () => { unsubMatches(); unsubBanner(); unsubRules(); unsubGroupNames(); unsubComments() }
   }, [])
 
   // Auto-triggers removed to prevent race-condition duplicates.
@@ -255,6 +267,9 @@ function App() {
   const sortedMatches = [...matches].sort((a,b) => (a.matchOrder || 0) - (b.matchOrder || 0))
   
   const scheduleFilters = ['ALL', 'A', 'B', 'C', 'D']
+
+  // Helper: lấy tên hiển thị cho bảng đấu (hỗ trợ tên custom)
+  const getGroupDisplayName = (group) => groupNames[group] || `Bảng ${group}`
 
   // Xếp hạng chung cuộc: dựa trên kết quả trận phân hạng (Lượt 3)
   // Label 23 → Hạng 1-2, Label 24 → Hạng 3-4, Label 21 → Hạng 5-6,
@@ -310,20 +325,10 @@ function App() {
     })
 
     // Gán finalRank từ kết quả các trận phân hạng cuối (Lượt 3 - FINAL)
-    // Mapping: label → [rank_winner, rank_loser]
-    const finalRankMap = {
-      23: [1, 2],   // Hạng 1-2
-      24: [3, 4],   // Hạng 3-4
-      21: [5, 6],   // Hạng 5-6
-      22: [7, 8],   // Hạng 7-8
-      19: [9, 10],  // Hạng 9-10
-      20: [11, 12]  // Hạng 11-12
-    }
-
+    // Dynamic: đọc rankWinner/rankLoser từ match data (không hardcode)
     matches.forEach(m => {
       if (m.stage !== 'FINAL') return
-      const rankPair = finalRankMap[m.label]
-      if (!rankPair) return
+      if (m.rankWinner == null || m.rankLoser == null) return
       const aScore = m.teamA_score
       const bScore = m.teamB_score
       if (aScore == null || bScore == null || aScore === '' || bScore === '') return
@@ -331,8 +336,8 @@ function App() {
       const b = Number(bScore)
       const winnerId = a > b ? m.teamA_id : m.teamB_id
       const loserId = a > b ? m.teamB_id : m.teamA_id
-      if (winnerId && stats[winnerId]) stats[winnerId].finalRank = rankPair[0]
-      if (loserId && stats[loserId]) stats[loserId].finalRank = rankPair[1]
+      if (winnerId && stats[winnerId]) stats[winnerId].finalRank = m.rankWinner
+      if (loserId && stats[loserId]) stats[loserId].finalRank = m.rankLoser
     })
 
     return Object.values(stats).map(s => ({
@@ -362,8 +367,10 @@ function App() {
       const batch = writeBatch(db)
       const teamsRef = collection(db, "teams")
 
-      // Sử dụng tên placeholder: 12 đội -> 4 bảng x 3 đội. Mỗi đội có tên đội (A1..D3) và 2 vận động viên
+      // Tạo 16 đội mẫu → 4 bảng x 4 đội. Mỗi đội có tên đội (A1..D4) và 2 vận động viên
+      const TEAMS_PER_GROUP = 4
       const groups = ["A", "B", "C", "D"]
+      const totalTeams = groups.length * TEAMS_PER_GROUP
       // Clear existing teams and matches first
       try {
         const teamsSnap = await getDocs(collection(db, 'teams'))
@@ -376,13 +383,13 @@ function App() {
         console.error('Lỗi khi xóa dữ liệu cũ:', err)
       }
 
-      const mockPlayers = Array.from({ length: 12 }, (_, i) => {
+      const mockPlayers = Array.from({ length: totalTeams }, (_, i) => {
         return { p1: `VĐV ${i*2+1}`, p2: `VĐV ${i*2+2}` }
       })
 
       mockPlayers.forEach((p, index) => {
-        const groupIndex = Math.floor(index / 3)
-        const teamLabel = `${groups[groupIndex]}${(index % 3) + 1}` // A1..A3, B1..B3
+        const groupIndex = Math.floor(index / TEAMS_PER_GROUP)
+        const teamLabel = `${groups[groupIndex]}${(index % TEAMS_PER_GROUP) + 1}` // A1..A4, B1..B4
         const newTeamRef = doc(teamsRef)
         batch.set(newTeamRef, {
           name: `Đội ${teamLabel}`,
@@ -396,7 +403,7 @@ function App() {
       })
 
       await batch.commit()
-      alert("🎉 Đã xóa dữ liệu cũ và tạo mới 12 cặp đấu mẫu (4 bảng x 3 đội)!")
+      alert(`🎉 Đã xóa dữ liệu cũ và tạo mới ${totalTeams} cặp đấu mẫu (4 bảng x ${TEAMS_PER_GROUP} đội)!`)
       fetchTeams()
     } catch (error) {
       console.error("Lỗi tạo dữ liệu: ", error)
@@ -448,9 +455,10 @@ function App() {
 
   // 2. LOGIC TẠO LỊCH THI ĐẤU (Hỗ trợ bảng 3 đội round-robin)
   const generateSchedule = async () => {
-    // Nếu dùng mock data 12 đội (4 bảng x 3 đội)
-    if (teams.length < 12) {
-        alert("Bạn cần tạo dữ liệu 12 cặp đấu (4 bảng x 3 đội) trước!"); return;
+    // Kiểm tra mỗi bảng có ít nhất 3 đội
+    const minTeamsPerGroup = Math.min(...['A','B','C','D'].map(g => (groupedTeams[g] || []).length))
+    if (minTeamsPerGroup < 3) {
+        alert(`Mỗi bảng cần ít nhất 3 đội. Hiện tại bảng nhỏ nhất chỉ có ${minTeamsPerGroup} đội.`); return;
       }
       setLoading(true)
       try {
@@ -877,21 +885,19 @@ function App() {
     }
   }
 
-  // Sinh Lượt 2 (Phân hạng) và các trận chung kết phân hạng theo sơ đồ ảnh
+  // Sinh Lượt 2 (Phân hạng) và các trận chung kết phân hạng — dynamic cho 3 hoặc 4 đội/bảng
   const generatePhase2AndFinals = async () => {
-    // Dùng thứ hạng hiện tại trong bảng (từ computeStandingsForGroup)
     const groups = ['A','B','C','D']
     const standingsMap = {}
     groups.forEach(g => {
-      const s = computeStandingsForGroup(g)
-      // đảm bảo sắp xếp theo điểm
-      s.sort((a,b) => (b.points||0)-(a.points||0) || (b.setDifference||0)-(a.setDifference||0))
-      standingsMap[g] = s
+      standingsMap[g] = computeStandingsForGroup(g)
     })
 
-    // verify mỗi bảng có ít nhất 3 đội
-    for (const g of groups) {
-      if (!standingsMap[g] || standingsMap[g].length < 3) { alert('Mỗi bảng cần ít nhất 3 đội để tạo Lượt 2. Vui lòng kiểm tra dữ liệu.'); return }
+    // Xác định số đội mỗi bảng (lấy min)
+    const teamsPerGroup = Math.min(...groups.map(g => (standingsMap[g] || []).length))
+    if (teamsPerGroup < 3) {
+      alert(`Mỗi bảng cần ít nhất 3 đội. Hiện tại bảng nhỏ nhất chỉ có ${teamsPerGroup} đội.`)
+      return
     }
 
     setLoading(true)
@@ -899,80 +905,115 @@ function App() {
       const batch = writeBatch(db)
       const matchesRef = collection(db, 'matches')
 
-      // Xác định matchOrder bắt đầu từ tổng số trận hiện tại
-      let matchOrderStart = matches.length || 0
-      const created = []
+      // matchOrder bắt đầu từ tổng số trận hiện tại
+      const groupStageCount = matches.filter(m => m.stage === 'GROUP_STAGE').length
+      let labelCounter = groupStageCount
+      let matchOrderCounter = matches.length || 0
 
-      // Tạo Trận 13..18 như trong sơ đồ: 3A-3D, 3B-3C, 2A-2D, 2B-2C, 1A-1D, 1B-1C
-      const p = []
-      p.push({ label: 13, a: standingsMap['A'][2], b: standingsMap['D'][2] })
-      p.push({ label: 14, a: standingsMap['B'][2], b: standingsMap['C'][2] })
-      p.push({ label: 15, a: standingsMap['A'][1], b: standingsMap['D'][1] })
-      p.push({ label: 16, a: standingsMap['B'][1], b: standingsMap['C'][1] })
-      p.push({ label: 17, a: standingsMap['A'][0], b: standingsMap['D'][0] })
-      p.push({ label: 18, a: standingsMap['B'][0], b: standingsMap['C'][0] })
+      // === PHASE 2: Tạo cặp đấu theo hạng (bét → nhất) ===
+      // Hạng R: A[R-1] ↔ D[R-1], B[R-1] ↔ C[R-1]
+      const phase2Labels = [] // lưu [{label, rank, pair:'AD'|'BC'}]
 
-      const createdByLabel = {}
-      for (const item of p) {
-        const newRef = doc(matchesRef)
-        matchOrderStart++
-        const docData = {
-          label: item.label,
+      for (let rank = teamsPerGroup; rank >= 1; rank--) {
+        const rankIdx = rank - 1 // index trong standings array
+
+        // Cặp A ↔ D
+        labelCounter++
+        matchOrderCounter++
+        const labelAD = labelCounter
+        const aTeamAD = standingsMap['A'][rankIdx]
+        const dTeamAD = standingsMap['D'][rankIdx]
+        batch.set(doc(matchesRef), {
+          label: labelAD,
           group: 'PHASE2',
           round: null,
           stage: 'PHASE2',
-          teamA_id: item.a.id,
-          teamA_name: item.a.name,
-          teamB_id: item.b.id,
-          teamB_name: item.b.name,
+          teamA_id: aTeamAD.id,
+          teamA_name: aTeamAD.name,
+          teamB_id: dTeamAD.id,
+          teamB_name: dTeamAD.name,
           status: 'UPCOMING',
-          matchOrder: matchOrderStart
-        }
-        batch.set(newRef, docData)
-        createdByLabel[item.label] = { idRef: newRef, data: docData }
-        created.push({ id: newRef.id, label: item.label })
+          matchOrder: matchOrderCounter,
+          rankGroup: rank
+        })
+        phase2Labels.push({ label: labelAD, rank, pair: 'AD' })
+
+        // Cặp B ↔ C
+        labelCounter++
+        matchOrderCounter++
+        const labelBC = labelCounter
+        const bTeamBC = standingsMap['B'][rankIdx]
+        const cTeamBC = standingsMap['C'][rankIdx]
+        batch.set(doc(matchesRef), {
+          label: labelBC,
+          group: 'PHASE2',
+          round: null,
+          stage: 'PHASE2',
+          teamA_id: bTeamBC.id,
+          teamA_name: bTeamBC.name,
+          teamB_id: cTeamBC.id,
+          teamB_name: cTeamBC.name,
+          status: 'UPCOMING',
+          matchOrder: matchOrderCounter,
+          rankGroup: rank
+        })
+        phase2Labels.push({ label: labelBC, rank, pair: 'BC' })
       }
 
-      // Tạo các trận phân hạng tiếp theo (những trận phụ thuộc kết quả)
-      // Hạng 9-10 : Thắng 13 - Thắng 14
-      // Hạng 11-12: Thua 13 - Thua 14
-      // Hạng 5-6 : Thắng 15 - Thắng 16
-      // Hạng 7-8 : Thua 15 - Thua 16
-      // Hạng 1-2 : Thắng 17 - Thắng 18
-      // Hạng 3-4 : Thua 17 - Thua 18
-      const finalPairs = [
-        { label: 19, type: 'FINAL_9_10', srcA: 13, srcB: 14, title: 'Hạng 9-10' },
-        { label: 20, type: 'FINAL_11_12', srcA: 'loser13', srcB: 'loser14', title: 'Hạng 11-12' },
-        { label: 21, type: 'FINAL_5_6', srcA: 15, srcB: 16, title: 'Hạng 5-6' },
-        { label: 22, type: 'FINAL_7_8', srcA: 'loser15', srcB: 'loser16', title: 'Hạng 7-8' },
-        { label: 23, type: 'FINAL_1_2', srcA: 17, srcB: 18, title: 'Hạng 1-2' },
-        { label: 24, type: 'FINAL_3_4', srcA: 'loser17', srcB: 'loser18', title: 'Hạng 3-4' }
-      ]
- 
-      for (const fp of finalPairs) {
-        const newRef = doc(matchesRef)
-        matchOrderStart++
-        // store references to source matches using their labels; UI will resolve these when source matches finished
-        const docData = {
-          label: fp.label,
+      // === FINALS: Chung kết phân hạng ===
+      // Mỗi nhóm hạng R → 2 trận final:
+      //   Winner(AD) vs Winner(BC) → Hạng [(R-1)*4+1, (R-1)*4+2]
+      //   Loser(AD) vs Loser(BC)  → Hạng [(R-1)*4+3, (R-1)*4+4]
+      for (let rank = teamsPerGroup; rank >= 1; rank--) {
+        const adLabel = phase2Labels.find(p => p.rank === rank && p.pair === 'AD').label
+        const bcLabel = phase2Labels.find(p => p.rank === rank && p.pair === 'BC').label
+        const baseRank = (rank - 1) * 4 + 1
+
+        // Trận Winner: Thắng AD vs Thắng BC
+        labelCounter++
+        matchOrderCounter++
+        batch.set(doc(matchesRef), {
+          label: labelCounter,
           group: 'PHASE2',
           round: null,
           stage: 'FINAL',
-          sourceA: fp.srcA,
-          sourceB: fp.srcB,
+          sourceA: adLabel,
+          sourceB: bcLabel,
           teamA_id: null,
-          teamA_name: fp.title + ' (A)',
+          teamA_name: `Hạng ${baseRank}-${baseRank + 1} (A)`,
           teamB_id: null,
-          teamB_name: fp.title + ' (B)',
+          teamB_name: `Hạng ${baseRank}-${baseRank + 1} (B)`,
           status: 'PENDING_SOURCE',
-          matchOrder: matchOrderStart
-        }
-        batch.set(newRef, docData)
-        created.push({ id: newRef.id, label: fp.label })
+          matchOrder: matchOrderCounter,
+          rankWinner: baseRank,
+          rankLoser: baseRank + 1
+        })
+
+        // Trận Loser: Thua AD vs Thua BC
+        labelCounter++
+        matchOrderCounter++
+        batch.set(doc(matchesRef), {
+          label: labelCounter,
+          group: 'PHASE2',
+          round: null,
+          stage: 'FINAL',
+          sourceA: 'loser' + adLabel,
+          sourceB: 'loser' + bcLabel,
+          teamA_id: null,
+          teamA_name: `Hạng ${baseRank + 2}-${baseRank + 3} (A)`,
+          teamB_id: null,
+          teamB_name: `Hạng ${baseRank + 2}-${baseRank + 3} (B)`,
+          status: 'PENDING_SOURCE',
+          matchOrder: matchOrderCounter,
+          rankWinner: baseRank + 2,
+          rankLoser: baseRank + 3
+        })
       }
 
       await batch.commit()
-      alert('✅ Đã tạo Lượt 2 và các trận chung kết phân hạng. Vui lòng nhập kết quả các trận Lượt 2 để sinh các trận phân hạng tiếp theo.')
+      const totalPhase2 = teamsPerGroup * 2
+      const totalFinals = teamsPerGroup * 2
+      alert(`✅ Đã tạo ${totalPhase2} trận Lượt 2 + ${totalFinals} trận Chung kết phân hạng (${teamsPerGroup} đội/bảng). Tổng: ${totalPhase2 + totalFinals} trận mới.`)
     } catch (err) {
       console.error('Lỗi tạo Lượt 2:', err)
       alert('Lỗi khi tạo Lượt 2. Vui lòng thử lại.')
@@ -1223,6 +1264,12 @@ function App() {
 
       {/* Hero Banner */}
       <div className="hero-banner" style={bannerData.imageUrl ? { backgroundImage: `url(${bannerData.imageUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}>
+        {/* Progress Bar (tính số trận đã hoàn thành) */}
+        {matches.length > 0 && (
+          <div className="tournament-progress">
+            <div className="progress-bar" style={{ width: `${(matches.filter(m => m.status === 'COMPLETED').length / matches.length) * 100}%` }}></div>
+          </div>
+        )}
         {/* SVG shuttlecock backdrop decoration */}
         <div className="hero-backdrop-svg" aria-hidden="true">
           <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ position: 'absolute', right: '38%', top: '10%', width: 180, opacity: 0.07 }}>
@@ -1249,17 +1296,18 @@ function App() {
             <h1 className="hero-title">{bannerData.title || 'HD Badminton Beer Cup 🏸'}</h1>
             <p className="hero-subtitle">{bannerData.subtitle || 'Giải đánh đôi nam-nữ hỗn hợp'}</p>
             <div className="hero-stats-row">
-              <div className="hero-stat"><span className="hs-num">12</span><span className="hs-label">Đội</span></div>
-              <div className="hero-stat"><span className="hs-num">4</span><span className="hs-label">Bảng</span></div>
-              <div className="hero-stat"><span className="hs-num">24</span><span className="hs-label">Trận</span></div>
-              <div className="hero-stat"><span className="hs-num">🍺</span><span className="hs-label">Beer!</span></div>
+              <div className="hero-stat"><span className="hs-num">{teams.length || '—'}</span><span className="hs-label">Đội</span></div>
+              <div className="hero-stat"><span className="hs-num">{Object.keys(groupedTeams).filter(g => groupedTeams[g].length > 0).length || 4}</span><span className="hs-label">Bảng</span></div>
+              <div className="hero-stat"><span className="hs-num">{matches.length || '—'}</span><span className="hs-label">Trận</span></div>
+              <div className="hero-stat"><span className="hs-num">{matches.filter(m => m.status === 'COMPLETED').length}</span><span className="hs-label">Xong ✅</span></div>
             </div>
             <div className="hero-meme">{todayMeme}</div>
             {isAdmin && (
               <div className="hero-admin-actions">
-                <button onClick={generateMockTeams} className="btn-hero-action" disabled={loading}>🎲 Đội mẫu</button>
-                <button onClick={generateSchedule} className="btn-hero-action" disabled={loading}>📅 Lịch bảng</button>
-                <button onClick={generatePhase2AndFinals} className="btn-hero-action" disabled={loading}>🏆 Lượt 2</button>
+                <button onClick={generateMockTeams} className="btn-hero-action" disabled={loading}>🎲 Tạo đội mẫu</button>
+                <button onClick={generateSchedule} className="btn-hero-action" disabled={loading}>📅 Tạo lịch vòng bảng</button>
+                <button onClick={generatePhase2AndFinals} className="btn-hero-action" disabled={loading}>🏆 Tạo lượt 2 & chung kết</button>
+                <button onClick={() => { setGroupNamesForm({...groupNames}); setGroupNamesEditOpen(true) }} className="btn-hero-action" disabled={loading}>🏷️ Đổi tên bảng</button>
               </div>
             )}
           </div>
@@ -1393,7 +1441,7 @@ function App() {
 
               return (
                 <div key={group} className="group-card">
-                  <h2 className="group-title">Bảng {group}</h2>
+                  <h2 className="group-title">{getGroupDisplayName(group)}</h2>
                   <div className="standings-wrapper">
                     <table className="standings-table">
                       <thead>
@@ -1441,7 +1489,7 @@ function App() {
         <div className="groups-grid">
           {['A','B','C','D'].map(group => (
             <div key={group} className="group-card">
-              <h2 className="group-title">Bảng {group}</h2>
+              <h2 className="group-title">{getGroupDisplayName(group)}</h2>
               <div style={{ display: 'grid', gap: 10 }}>
                 {(groupedTeams[group] || []).map(team => (
                   <div key={team.id} className="team-card" style={{ borderLeft: `4px solid ${getGroupColor(group)}`, background: hexToRgba(getGroupColor(group), 0.10), cursor: isAdmin ? 'pointer' : 'default' }} onClick={() => isAdmin && handleOpenEditModal(team)}>
@@ -1902,6 +1950,42 @@ function App() {
            </div>
          </div>
        </div>
+      )}
+
+      {/* Modal Đổi tên bảng */}
+      {groupNamesEditOpen && (
+        <div className="modal-overlay" onClick={() => setGroupNamesEditOpen(false)}>
+          <div className="modal-content admin-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 440 }}>
+            <button className="close-btn" onClick={() => setGroupNamesEditOpen(false)}>×</button>
+            <h2 className="modal-title">🏷️ Đổi Tên Bảng Thi Đấu</h2>
+            <div className="form-group">
+              <label>Bảng A</label>
+              <input type="text" value={groupNamesForm.A} onChange={e => setGroupNamesForm({...groupNamesForm, A: e.target.value})} className="form-input" />
+            </div>
+            <div className="form-group">
+              <label>Bảng B</label>
+              <input type="text" value={groupNamesForm.B} onChange={e => setGroupNamesForm({...groupNamesForm, B: e.target.value})} className="form-input" />
+            </div>
+            <div className="form-group">
+              <label>Bảng C</label>
+              <input type="text" value={groupNamesForm.C} onChange={e => setGroupNamesForm({...groupNamesForm, C: e.target.value})} className="form-input" />
+            </div>
+            <div className="form-group">
+              <label>Bảng D</label>
+              <input type="text" value={groupNamesForm.D} onChange={e => setGroupNamesForm({...groupNamesForm, D: e.target.value})} className="form-input" />
+            </div>
+            <div className="modal-actions">
+              <button className="btn-cancel" onClick={() => setGroupNamesEditOpen(false)}>Hủy</button>
+              <button className="btn-save" onClick={async () => {
+                try {
+                  await setDoc(doc(db, 'config', 'groupNames'), groupNamesForm, { merge: true })
+                  alert('Lưu tên bảng thành công!')
+                  setGroupNamesEditOpen(false)
+                } catch(e) { alert('Lỗi khi lưu tên bảng') }
+              }}>💾 Lưu</button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Banner Edit Modal */}

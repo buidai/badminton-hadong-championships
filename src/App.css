@@ -128,10 +128,38 @@ body {
   font-family: 'Rajdhani', 'Orbitron', sans-serif;
   font-size: clamp(1.7rem, 3.2vw, 2.6rem);
   font-weight: 700;
-  color: #ffffff;
   margin: 0;
   line-height: 1.15;
   text-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  background: linear-gradient(to right, #fbbf24, #38bdf8, #22c55e, #fbbf24);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+  animation: bgPan 6s linear infinite;
+}
+
+@keyframes bgPan {
+  0% { background-position: 0% 50%; }
+  100% { background-position: -300% 50%; }
+}
+
+.tournament-progress {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: rgba(255,255,255,0.1);
+  z-index: 10;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--success));
+  box-shadow: 0 0 10px var(--primary);
+  transition: width 0.8s ease-in-out;
 }
 
 .hero-subtitle {
@@ -791,6 +819,19 @@ body {
   margin: 0 0 14px;
   padding-bottom: 8px;
   border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.group-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text);
+  background: rgba(255,255,255,0.1);
+  padding: 2px 8px;
+  border-radius: 99px;
+  font-family: 'Inter', sans-serif;
 }
 
 /* ─── Team Cards (inside groups tab) ─── */
