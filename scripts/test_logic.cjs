@@ -298,9 +298,11 @@ console.log('\n🔵 TEST: Bracket independent of vòng bảng group filter')
 console.log('\n🔵 TEST: Winner detection với score lưu dạng string')
 {
   // Trước fix: aScore/bScore là string → "9" > "21" = true (sai)
+  // Mirror exactly resolveDependentMatchesByLabel: raw null check, then Number
   const resolveWinner = (aRaw, bRaw) => {
+    if (aRaw == null || bRaw == null) return null
     const a = Number(aRaw), b = Number(bRaw)
-    if (a == null || b == null || isNaN(a) || isNaN(b)) return null
+    if (isNaN(a) || isNaN(b)) return null
     return a > b ? 'A' : 'B'
   }
   assert(resolveWinner('9', '21') === 'B', 'String "9" vs "21" → thắng là B (21)')

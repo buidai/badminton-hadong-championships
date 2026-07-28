@@ -1,44 +1,103 @@
 /* ==========================================================================
    HD Badminton Beer Cup – Tournament Web UI
-   Complete Design System (Dark Theme / Esports Aesthetic)
+   Design System v2 — rule-based (60-30-10 · modular type · 8px grid)
    ========================================================================== */
 
-/* ─── Design Tokens ─── */
+/* ─── Design Tokens ───
+   COLOR ROLES (60-30-10):
+     60% canvas  : --bg / --surface (dark base)
+     30% surface : cards, panels, tables
+     10% accent  : --primary (cyan) = single brand accent; --accent (gold) = MVP/highlight only
+   GROUP COLORS (A/B/C/D) are DATA, not chrome — used only to encode bracket standing.
+*/
 :root {
   color-scheme: dark;
+
+  /* ── Color: canvas (60%) ── */
   --bg: #070b14;
+  --bg-2: #0a1019;
+
+  /* ── Color: surface (30%) ── */
   --surface: #0d1422;
   --surface-strong: #111a2e;
   --surface-soft: #142036;
-  --primary: #38bdf8;
+
+  /* ── Color: accent (10%) ── */
+  --primary: #38bdf8;          /* brand accent (cyan) — interactive, links, focus */
   --primary-strong: #22d3ee;
-  --accent: #fbbf24;
+  --primary-dim: rgba(56,189,248,0.12);
+  --accent: #fbbf24;           /* gold — MVP / highlight / logo ONLY */
   --accent-soft: rgba(251,191,36,0.12);
   --success: #22c55e;
   --danger: #ef4444;
   --warn: #f59e0b;
+
+  /* ── Color: text ── */
   --text: #e8edf5;
   --muted: #93a1b5;
   --dim: #5f7088;
+
+  /* ── Color: border (shadow-as-border technique) ── */
   --border: rgba(148,163,184,0.10);
   --border-glow: rgba(56,189,248,0.22);
+
+  /* ── Data colors (group standing) ── */
+  --g-A: #3b82f6;
+  --g-B: #22c55e;
+  --g-C: #ef4444;
+  --g-D: #a855f7;
+
+  /* ── Surfaces with blur ── */
   --glass: rgba(13,20,34,0.72);
   --glass-strong: rgba(13,20,34,0.90);
-  --radius: 14px;
-  --radius-sm: 9px;
-  --shadow: 0 10px 34px rgba(0,0,0,0.5);
-  --shadow-glow: 0 0 0 1px rgba(56,189,248,0.12), 0 12px 40px rgba(0,0,0,0.5);
+
+  /* ── Radius scale (conservative, 4–14px) ── */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius: 12px;
+  --radius-lg: 16px;
+  --radius-pill: 999px;
+
+  /* ── Spacing scale (8px grid) ── */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 24px;
+  --sp-6: 32px;
+  --sp-7: 48px;
+
+  /* ── Typography: modular scale (ratio 1.25, Minor Third) ──
+     base 0.8rem → x1.25 each step */
+  --fs-nano: 0.64rem;   /* 10px  */
+  --fs-micro: 0.72rem;  /* 11.5px */
+  --fs-caption: 0.8rem; /* 12.8px */
+  --fs-sm: 0.88rem;     /* 14px */
+  --fs-base: 1rem;      /* 16px */
+  --fs-md: 1.25rem;     /* 20px */
+  --fs-lg: 1.563rem;    /* 25px */
+  --fs-xl: 1.953rem;    /* 31px */
+  --fs-2xl: 2.441rem;   /* 39px */
+
+  /* ── Shadow system (layered, brand-tinted) ── */
+  --shadow-surface: 0 0 0 1px var(--border), 0 2px 8px rgba(0,0,0,0.35);
+  --shadow-elevated: 0 0 0 1px var(--border), 0 10px 30px -12px rgba(0,0,0,0.6);
+  --shadow-glow: 0 0 0 1px rgba(56,189,248,0.18), 0 12px 40px -12px rgba(0,0,0,0.6);
+  --shadow-card: 0 0 0 1px var(--border), 0 8px 24px -10px rgba(0,0,0,0.5);
+
   --transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
 }
 
 body {
   background:
     radial-gradient(1200px 600px at 85% -10%, rgba(56,189,248,0.10), transparent 60%),
-    radial-gradient(900px 500px at -10% 110%, rgba(251,191,36,0.06), transparent 55%),
-    #070b14;
+    radial-gradient(900px 500px at -10% 110%, rgba(251,191,36,0.05), transparent 55%),
+    var(--bg);
   background-attachment: fixed;
   color: var(--text);
   font-family: 'Inter', 'Outfit', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: var(--fs-base);
+  line-height: 1.5;
 }
 
 /* ─── App Shell ─── */
@@ -818,11 +877,12 @@ body {
 
 .group-title {
   font-family: 'Rajdhani', sans-serif;
-  font-size: 1.25rem;
+  font-size: var(--fs-md);
   font-weight: 700;
+  letter-spacing: -0.3px;
   color: var(--primary);
-  margin: 0 0 14px;
-  padding-bottom: 8px;
+  margin: 0 0 var(--sp-3);
+  padding-bottom: var(--sp-2);
   border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
@@ -1811,11 +1871,11 @@ body {
 }
 .rules-title {
   font-family: 'Rajdhani', sans-serif;
-  font-size: 1.5rem;
+  font-size: var(--fs-xl);
   font-weight: 700;
   color: #fbbf24;
   margin: 0;
-  letter-spacing: 0.5px;
+  letter-spacing: -0.4px;
 }
 .rules-subtitle {
   margin: 6px 0 0;
@@ -1883,10 +1943,11 @@ body {
 .topbar-logo svg { width: 100%; height: 100%; }
 .topbar-h1 {
   font-family: 'Rajdhani', 'Orbitron', sans-serif;
-  font-size: 1.3rem;
+  font-size: var(--fs-lg);
   font-weight: 700;
   margin: 0;
   line-height: 1.1;
+  letter-spacing: -0.5px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -2010,4 +2071,27 @@ body {
 
 @media (max-width: 480px) {
   .rules-toggle { font-size: 0.95rem; padding: 12px 14px; }
+}
+
+/* ─── Design System Rules (applied globally) ───
+   - Accessibility focus ring (cyan, 2px) on all interactive elements
+   - Tabular numerals for any data display
+   - Consistent label/caption sizing from the modular scale
+*/
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-xs);
+}
+.btn-primary, .btn-hero-action, .btn-tab, .btn-clear-option, .btn-auth, .btn-banner-edit {
+  font-size: var(--fs-sm);
+}
+.hero-stat, .tb-stat .tb-num { font-variant-numeric: tabular-nums; }
+.caption, .mvp-empty-hint, .group-badge, .cm-status-pill {
+  font-size: var(--fs-caption);
+}
+/* Section headings use the modular scale + negative tracking (display compression) */
+h2, h3 {
+  font-family: 'Rajdhani', sans-serif;
+  letter-spacing: -0.3px;
 }
