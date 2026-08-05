@@ -1,29 +1,11 @@
 // Firestore rules for the badminton tournament app.
-// Use the "dev" section during local development or while testing.
-// For production, use the stronger authentication-based restrictions below.
-
-// ===== Development rules (easy to test) =====
-// service cloud.firestore {
-//   match /databases/{database}/documents {
-//     match /{document=**} {
-//       allow read, write: if true;
-//     }
-//   }
-// }
-
+// Dev mode: allow all reads/writes. The app uses a frontend-only hardcoded admin
+// (localStorage flag), so it has no Firebase Auth — writes would be blocked by
+// the stricter rules. TODO (step 6): add Firebase Auth for admin and tighten these.
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /teams/{teamId} {
-      allow read: if true;
-      allow write: if request.auth != null;
-    }
-    match /matches/{matchId} {
-      allow read: if true;
-      allow write: if request.auth != null;
-    }
     match /{document=**} {
-      allow read: if true;
-      allow write: if false;
+      allow read, write: if true;
     }
   }
 }
