@@ -1642,7 +1642,7 @@ function App() {
       {/* Collapsible Thể lệ panel under the banner */}
       <div className="rules-panel">
         <button className="rules-toggle" onClick={() => setRulesOpen(o => !o)}>
-          <span>📋 Thể lệ giải đấu</span>
+          <span>📋 Thể lệ giải đấu <span className="rules-badge">Quan trọng</span></span>
           <span className={`rules-chevron ${rulesOpen ? 'open' : ''}`}>{rulesOpen ? '▲' : '▼'}</span>
         </button>
         {rulesOpen && (

@@ -1726,16 +1726,19 @@ body {
   .standings-table td {
     padding: 8px 7px;
     font-size: 0.82rem;
+    white-space: normal;
+  }
   .team-cell {
     /* ensure long player names wrap instead of stretching the table */
-    max-width: 220px;
+    max-width: 200px;
     min-width: 0;
+    white-space: normal;
   }
   .team-name {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 200px;
+    max-width: 180px;
   }
   .player-names {
     font-size: 0.72rem;
@@ -1863,8 +1866,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: var(--glass);
-  border: 1px solid var(--border);
+  background: linear-gradient(135deg, rgba(251,191,36,0.16), rgba(15,23,42,0.7));
+  border: 1px solid rgba(251,191,36,0.55);
   border-left: 4px solid #fbbf24;
   border-radius: var(--radius);
   padding: 14px 16px;
@@ -1873,8 +1876,26 @@ body {
   font-size: 1.05rem;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: var(--shadow);
+  box-shadow: 0 0 0 1px rgba(251,191,36,0.12), 0 8px 24px -10px rgba(251,191,36,0.4);
   backdrop-filter: blur(10px);
+  animation: rulesGlow 2.6s ease-in-out infinite;
+}
+@keyframes rulesGlow {
+  0%, 100% { box-shadow: 0 0 0 1px rgba(251,191,36,0.12), 0 8px 24px -10px rgba(251,191,36,0.35); }
+  50% { box-shadow: 0 0 0 1px rgba(251,191,36,0.35), 0 10px 30px -8px rgba(251,191,36,0.6); }
+}
+.rules-badge {
+  display: inline-block;
+  background: #fbbf24;
+  color: #0f172a;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  padding: 3px 8px;
+  border-radius: 99px;
+  margin-left: 10px;
+  vertical-align: middle;
+  text-transform: uppercase;
 }
 .rules-chevron { font-size: 0.8rem; transition: transform 0.2s ease; }
 .rules-chevron.open { transform: rotate(180deg); }
