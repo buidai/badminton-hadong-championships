@@ -533,22 +533,22 @@ function App() {
   // ─── Alpha-only: Rollback to initial seeded data (with warning) ───
   const [rollbackOpen, setRollbackOpen] = useState(false)
   const REAL_TEAMS_INITIAL = [
-    { group: 'A', label: 'A1', p1: 'Quản Thành Công', p2: 'Nguyễn Quý Thanh', name: 'Đôi Đũa Lệch' },
-    { group: 'A', label: 'A2', p1: 'Tuấn Đào', p2: 'Hà Hồng', name: 'Đèo Bòng Cầu Lông' },
-    { group: 'A', label: 'A3', p1: 'Phạm Minh Quang', p2: 'Ngọc Quỳnh', name: 'Song Sắt Song Sành' },
-    { group: 'A', label: 'A4', p1: 'Hoàng Nam', p2: 'Dương Thị Thu Phương', name: 'Đôi Cánh Vàng' },
-    { group: 'B', label: 'B1', p1: 'Đặng Anh Quang', p2: 'Thanh Thu', name: 'Gió Đưa Hờn' },
-    { group: 'B', label: 'B2', p1: 'Nguyễn Lộc', p2: 'Lê Dung', name: 'Chạy Lại Đi' },
-    { group: 'B', label: 'B3', p1: 'Linh', p2: 'Bùi Thùy Dương', name: 'Tay Mơ Nhưng Chơi' },
-    { group: 'B', label: 'B4', p1: 'Nguyên Phương Nam', p2: 'An Thanh', name: 'Anh Thanh Cả' },
-    { group: 'C', label: 'C1', p1: 'Đại', p2: 'Phạm Thị Thu', name: 'Đại Gia Đình' },
-    { group: 'C', label: 'C2', p1: 'Đào Văn Trường', p2: 'Đỗ Linh', name: 'Trường Kỳ Kháng Chiến' },
-    { group: 'C', label: 'C3', p1: 'Phong Lê', p2: 'Dương Minh Ngọc', name: 'Phong Độ Đỉnh' },
-    { group: 'C', label: 'C4', p1: 'Đức Hưng', p2: 'Hoa', name: 'Hoa Cười Cỏ Thơm' },
-    { group: 'D', label: 'D1', p1: 'Duy Toàn', p2: 'Ngân Nguyễn', name: 'Toàn Tôm Tắt' },
-    { group: 'D', label: 'D2', p1: 'Hai An', p2: 'Jet Tran', name: 'Hai An Toàn' },
-    { group: 'D', label: 'D3', p1: 'BT Thức', p2: 'Kim Hồng', name: 'Thức Thì Thua' },
-    { group: 'D', label: 'D4', p1: 'Pham Thanh Tú', p2: 'Hồng Anh', name: 'Thúy Kiều Tú' },
+    { group: 'A', label: 'A1', p1: 'Quản Thành Công', p2: 'Nguyễn Quý Thanh', name: 'Đôi Lệch' },
+    { group: 'A', label: 'A2', p1: 'Tuấn Đào', p2: 'Hà Hồng', name: 'Đèo Bòng' },
+    { group: 'A', label: 'A3', p1: 'Phạm Minh Quang', p2: 'Ngọc Quỳnh', name: 'Song Sành' },
+    { group: 'A', label: 'A4', p1: 'Hoàng Nam', p2: 'Dương Thị Thu Phương', name: 'Cánh Vàng' },
+    { group: 'B', label: 'B1', p1: 'Đặng Anh Quang', p2: 'Thanh Thu', name: 'Gió Hờn' },
+    { group: 'B', label: 'B2', p1: 'Nguyễn Lộc', p2: 'Lê Dung', name: 'Chạy Lại' },
+    { group: 'B', label: 'B3', p1: 'Linh', p2: 'Bùi Thùy Dương', name: 'Tay Mơ' },
+    { group: 'B', label: 'B4', p1: 'Nguyên Phương Nam', p2: 'An Thanh', name: 'Anh Thanh' },
+    { group: 'C', label: 'C1', p1: 'Đại', p2: 'Phạm Thị Thu', name: 'Đại Gia' },
+    { group: 'C', label: 'C2', p1: 'Đào Văn Trường', p2: 'Đỗ Linh', name: 'Trường Kỳ' },
+    { group: 'C', label: 'C3', p1: 'Phong Lê', p2: 'Dương Minh Ngọc', name: 'Phong Độ' },
+    { group: 'C', label: 'C4', p1: 'Đức Hưng', p2: 'Hoa', name: 'Hoa Cỏ' },
+    { group: 'D', label: 'D1', p1: 'Duy Toàn', p2: 'Ngân Nguyễn', name: 'Tôm Tắt' },
+    { group: 'D', label: 'D2', p1: 'Hai An', p2: 'Jet Tran', name: 'Hai An' },
+    { group: 'D', label: 'D3', p1: 'BT Thức', p2: 'Kim Hồng', name: 'Thức Thua' },
+    { group: 'D', label: 'D4', p1: 'Pham Thanh Tú', p2: 'Hồng Anh', name: 'Thúy Kiều' },
   ]
   const rollbackToInitial = async () => {
     setRollbackOpen(false)
@@ -1361,15 +1361,16 @@ function App() {
     const groupTeams = groupedTeams[group] || []
     const posInGroup = Math.max(0, groupTeams.findIndex(t => t.id === team.id))
     const colorSet = (TEAM_GRADIENT_COLORS[group] || TEAM_GRADIENT_COLORS.A)[posInGroup % 3]
-    const symbolIdx = ['A','B','C','D'].indexOf(group) * 3 + posInGroup
-    const symbol = TEAM_SYMBOLS[symbolIdx % 12]
+    const monogram = (team.teamLabel || group).slice(0, 2).toUpperCase()
     return (
       <div style={{
         width: size, height: size, borderRadius: '50%', flexShrink: 0,
         background: `linear-gradient(135deg, ${colorSet[0]}, ${colorSet[1]})`,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontSize: size * 0.42, boxShadow: `0 3px 10px ${colorSet[0]}55`
-      }}>{symbol}</div>
+        fontSize: Math.round(size * 0.36), fontWeight: 800, color: '#0f172a',
+        fontFamily: "'Rajdhani', sans-serif", letterSpacing: '0.5px',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.18)'
+      }}>{monogram}</div>
     )
   }
 
@@ -1771,7 +1772,7 @@ function App() {
                             <td className="cell-small">{idx+1}</td>
                             <td className="team-cell">
                               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                <TeamLogo team={teams.find(t2=>t2.id===t.id)} size={30} />
+                                <span className="team-logo-wrap"><TeamLogo team={teams.find(t2=>t2.id===t.id)} size={26} /></span>
                                 <div>
                                   <div className="team-name">{t.name}</div>
                                   <div className="player-names">{t.player1} &amp; {t.player2}</div>
@@ -1828,7 +1829,7 @@ function App() {
                       <td className="cell-small" style={{ fontWeight: isMedal ? 800 : 400 }}>{medalEmoji} {rankDisplay}</td>
                       <td className="team-cell">
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                          <TeamLogo team={teams.find(t=>t.id===team.id)} size={30} />
+                          <span className="team-logo-wrap"><TeamLogo team={teams.find(t=>t.id===team.id)} size={26} /></span>
                           <div>
                             <div className="team-name">{team.name}</div>
                             <div className="player-names">{team.player1} &amp; {team.player2}</div>

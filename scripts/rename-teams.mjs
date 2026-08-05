@@ -1,5 +1,5 @@
 /**
- * Update team display names (funny, short) for the 16 real teams.
+ * Update team display names (short, harmonious) for the 16 real teams.
  * Keeps player1/player2 unchanged. Source of truth = chia_bang.jpg labels.
  * Run: FIREBASE_TOKEN=xxx node scripts/rename-teams.mjs
  */
@@ -17,24 +17,23 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig)
 const db = getFirestore(app)
 
-// label -> fun display name
 const NAMES = {
-  A1: 'Đôi Đũa Lệch',
-  A2: 'Đèo Bòng Cầu Lông',
-  A3: 'Song Sắt Song Sành',
-  A4: 'Đôi Cánh Vàng',
-  B1: 'Gió Đưa Hờn',
-  B2: 'Chạy Lại Đi',
-  B3: 'Tay Mơ Nhưng Chơi',
-  B4: 'Anh Thanh Cả',
-  C1: 'Đại Gia Đình',
-  C2: 'Trường Kỳ Kháng Chiến',
-  C3: 'Phong Độ Đỉnh',
-  C4: 'Hoa Cười Cỏ Thơm',
-  D1: 'Toàn Tôm Tắt',
-  D2: 'Hai An Toàn',
-  D3: 'Thức Thì Thua',
-  D4: 'Thúy Kiều Tú',
+  A1: 'Đôi Lệch',
+  A2: 'Đèo Bòng',
+  A3: 'Song Sành',
+  A4: 'Cánh Vàng',
+  B1: 'Gió Hờn',
+  B2: 'Chạy Lại',
+  B3: 'Tay Mơ',
+  B4: 'Anh Thanh',
+  C1: 'Đại Gia',
+  C2: 'Trường Kỳ',
+  C3: 'Phong Độ',
+  C4: 'Hoa Cỏ',
+  D1: 'Tôm Tắt',
+  D2: 'Hai An',
+  D3: 'Thức Thua',
+  D4: 'Thúy Kiều',
 }
 
 async function run() {
