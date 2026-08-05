@@ -1589,7 +1589,7 @@ function App() {
           <div className="topbar-stats">
             <div className="tb-stat"><span className="tb-num">{teams.length || '—'}</span><span className="tb-lbl">Đội</span></div>
             <div className="tb-stat"><span className="tb-num">{Object.keys(groupedTeams).filter(g => groupedTeams[g].length > 0).length || 4}</span><span className="tb-lbl">Bảng</span></div>
-            <div className="tb-stat"><span className="tb-num">{matches.length || 0}</span><span className="tb-lbl">Trận</span></div>
+            <div className="tb-stat"><span className="tb-num">40</span><span className="tb-lbl">Trận (24+16)</span></div>
             <div className="tb-stat"><span className="tb-num">{matches.filter(m => m.status === 'COMPLETED').length}</span><span className="tb-lbl">Xong ✅</span></div>
           </div>
         </div>
