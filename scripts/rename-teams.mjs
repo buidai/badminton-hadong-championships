@@ -1,6 +1,6 @@
 /**
- * Update team display names (short, harmonious) for the 16 real teams.
- * Keeps player1/player2 unchanged. Source of truth = chia_bang.jpg labels.
+ * Update team display names using the REAL male player's name (accurate, traceable
+ * to the seeded player list). Keeps player1/player2 unchanged.
  * Run: FIREBASE_TOKEN=xxx node scripts/rename-teams.mjs
  */
 import { initializeApp } from 'firebase/app'
@@ -18,22 +18,22 @@ const app = initializeApp(firebaseConfig)
 const db = getFirestore(app)
 
 const NAMES = {
-  A1: 'Đôi Lệch',
-  A2: 'Đèo Bòng',
-  A3: 'Song Sành',
-  A4: 'Cánh Vàng',
-  B1: 'Gió Hờn',
-  B2: 'Chạy Lại',
-  B3: 'Tay Mơ',
-  B4: 'Anh Thanh',
-  C1: 'Đại Gia',
-  C2: 'Trường Kỳ',
-  C3: 'Phong Độ',
-  C4: 'Hoa Cỏ',
-  D1: 'Tôm Tắt',
+  A1: 'Thành Công',
+  A2: 'Tuấn Đào',
+  A3: 'Minh Quang',
+  A4: 'Hoàng Nam',
+  B1: 'Anh Quang',
+  B2: 'Nguyễn Lộc',
+  B3: 'Linh',
+  B4: 'Phương Nam',
+  C1: 'Đại',
+  C2: 'Văn Trường',
+  C3: 'Phong Lê',
+  C4: 'Đức Hưng',
+  D1: 'Duy Toàn',
   D2: 'Hai An',
-  D3: 'Thức Thua',
-  D4: 'Thúy Kiều',
+  D3: 'BT Thức',
+  D4: 'Thanh Tú',
 }
 
 async function run() {

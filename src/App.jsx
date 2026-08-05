@@ -533,22 +533,22 @@ function App() {
   // ─── Alpha-only: Rollback to initial seeded data (with warning) ───
   const [rollbackOpen, setRollbackOpen] = useState(false)
   const REAL_TEAMS_INITIAL = [
-    { group: 'A', label: 'A1', p1: 'Quản Thành Công', p2: 'Nguyễn Quý Thanh', name: 'Đôi Lệch' },
-    { group: 'A', label: 'A2', p1: 'Tuấn Đào', p2: 'Hà Hồng', name: 'Đèo Bòng' },
-    { group: 'A', label: 'A3', p1: 'Phạm Minh Quang', p2: 'Ngọc Quỳnh', name: 'Song Sành' },
-    { group: 'A', label: 'A4', p1: 'Hoàng Nam', p2: 'Dương Thị Thu Phương', name: 'Cánh Vàng' },
-    { group: 'B', label: 'B1', p1: 'Đặng Anh Quang', p2: 'Thanh Thu', name: 'Gió Hờn' },
-    { group: 'B', label: 'B2', p1: 'Nguyễn Lộc', p2: 'Lê Dung', name: 'Chạy Lại' },
-    { group: 'B', label: 'B3', p1: 'Linh', p2: 'Bùi Thùy Dương', name: 'Tay Mơ' },
-    { group: 'B', label: 'B4', p1: 'Nguyên Phương Nam', p2: 'An Thanh', name: 'Anh Thanh' },
-    { group: 'C', label: 'C1', p1: 'Đại', p2: 'Phạm Thị Thu', name: 'Đại Gia' },
-    { group: 'C', label: 'C2', p1: 'Đào Văn Trường', p2: 'Đỗ Linh', name: 'Trường Kỳ' },
-    { group: 'C', label: 'C3', p1: 'Phong Lê', p2: 'Dương Minh Ngọc', name: 'Phong Độ' },
-    { group: 'C', label: 'C4', p1: 'Đức Hưng', p2: 'Hoa', name: 'Hoa Cỏ' },
-    { group: 'D', label: 'D1', p1: 'Duy Toàn', p2: 'Ngân Nguyễn', name: 'Tôm Tắt' },
+    { group: 'A', label: 'A1', p1: 'Quản Thành Công', p2: 'Nguyễn Quý Thanh', name: 'Thành Công' },
+    { group: 'A', label: 'A2', p1: 'Tuấn Đào', p2: 'Hà Hồng', name: 'Tuấn Đào' },
+    { group: 'A', label: 'A3', p1: 'Phạm Minh Quang', p2: 'Ngọc Quỳnh', name: 'Minh Quang' },
+    { group: 'A', label: 'A4', p1: 'Hoàng Nam', p2: 'Dương Thị Thu Phương', name: 'Hoàng Nam' },
+    { group: 'B', label: 'B1', p1: 'Đặng Anh Quang', p2: 'Thanh Thu', name: 'Anh Quang' },
+    { group: 'B', label: 'B2', p1: 'Nguyễn Lộc', p2: 'Lê Dung', name: 'Nguyễn Lộc' },
+    { group: 'B', label: 'B3', p1: 'Linh', p2: 'Bùi Thùy Dương', name: 'Linh' },
+    { group: 'B', label: 'B4', p1: 'Nguyên Phương Nam', p2: 'An Thanh', name: 'Phương Nam' },
+    { group: 'C', label: 'C1', p1: 'Đại', p2: 'Phạm Thị Thu', name: 'Đại' },
+    { group: 'C', label: 'C2', p1: 'Đào Văn Trường', p2: 'Đỗ Linh', name: 'Văn Trường' },
+    { group: 'C', label: 'C3', p1: 'Phong Lê', p2: 'Dương Minh Ngọc', name: 'Phong Lê' },
+    { group: 'C', label: 'C4', p1: 'Đức Hưng', p2: 'Hoa', name: 'Đức Hưng' },
+    { group: 'D', label: 'D1', p1: 'Duy Toàn', p2: 'Ngân Nguyễn', name: 'Duy Toàn' },
     { group: 'D', label: 'D2', p1: 'Hai An', p2: 'Jet Tran', name: 'Hai An' },
-    { group: 'D', label: 'D3', p1: 'BT Thức', p2: 'Kim Hồng', name: 'Thức Thua' },
-    { group: 'D', label: 'D4', p1: 'Pham Thanh Tú', p2: 'Hồng Anh', name: 'Thúy Kiều' },
+    { group: 'D', label: 'D3', p1: 'BT Thức', p2: 'Kim Hồng', name: 'BT Thức' },
+    { group: 'D', label: 'D4', p1: 'Pham Thanh Tú', p2: 'Hồng Anh', name: 'Thanh Tú' },
   ]
   const rollbackToInitial = async () => {
     setRollbackOpen(false)
@@ -1336,44 +1336,6 @@ function App() {
     }
   }
 
-  // Team logo symbols & colors
-  const TEAM_SYMBOLS = ['🦅','🔥','⚡','🌊','🏹','💎','🐉','🌟','🎯','👑','🚀','🦁']
-  const TEAM_GRADIENT_COLORS = {
-    A: [['#3b82f6','#1d4ed8'],['#60a5fa','#1e3a8a'],['#93c5fd','#1e40af']],
-    B: [['#22c55e','#15803d'],['#4ade80','#166534'],['#86efac','#14532d']],
-    C: [['#ef4444','#b91c1c'],['#f87171','#991b1b'],['#fca5a5','#7f1d1d']],
-    D: [['#a855f7','#7e22ce'],['#c084fc','#6b21a8'],['#d8b4fe','#581c87']]
-  }
-
-  const TeamLogo = ({ team, size = 40 }) => {
-    if (!team) return <div style={{ width: size, height: size, borderRadius: '50%', background: '#1e293b', flexShrink: 0 }} />
-    // If team has a custom icon uploaded by admin, show it
-    if (team.iconUrl) {
-      return (
-        <img src={team.iconUrl} alt={team.name} style={{
-          width: size, height: size, borderRadius: '50%', flexShrink: 0,
-          objectFit: 'cover', boxShadow: '0 3px 10px rgba(0,0,0,0.3)',
-          border: '2px solid rgba(255,255,255,0.15)'
-        }} />
-      )
-    }
-    const group = team.group || 'A'
-    const groupTeams = groupedTeams[group] || []
-    const posInGroup = Math.max(0, groupTeams.findIndex(t => t.id === team.id))
-    const colorSet = (TEAM_GRADIENT_COLORS[group] || TEAM_GRADIENT_COLORS.A)[posInGroup % 3]
-    const monogram = (team.teamLabel || group).slice(0, 2).toUpperCase()
-    return (
-      <div style={{
-        width: size, height: size, borderRadius: '50%', flexShrink: 0,
-        background: `linear-gradient(135deg, ${colorSet[0]}, ${colorSet[1]})`,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontSize: Math.round(size * 0.36), fontWeight: 800, color: '#0f172a',
-        fontFamily: "'Rajdhani', sans-serif", letterSpacing: '0.5px',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.18)'
-      }}>{monogram}</div>
-    )
-  }
-
   const BADMINTON_MEMES = [
     '🏸 "Cú smash này đến từ nỗi đau!" 😤',
     '🍺 "Sau giải là nhậu thôi!" 🎉',
@@ -1439,7 +1401,6 @@ function App() {
         </div>
         <div className="mc-body">
           <div className="mc-team mc-team-a">
-            <TeamLogo team={teamA} size={28} />
             <span className="mc-tname" style={{ color: mc, textShadow: `0 0 12px ${mc}80`, fontSize: '1.15rem' }}>{match.teamA_name || '?'}</span>
             {teamA && <span className="mc-players">{teamA.player1} &amp; {teamA.player2}</span>}
           </div>
@@ -1461,7 +1422,6 @@ function App() {
             )}
           </div>
           <div className="mc-team mc-team-b">
-            <TeamLogo team={teamB} size={28} />
             <span className="mc-tname" style={{ color: mc, textShadow: `0 0 12px ${mc}80`, fontSize: '1.15rem' }}>{match.teamB_name || '?'}</span>
             {teamB && <span className="mc-players">{teamB.player1} &amp; {teamB.player2}</span>}
           </div>
@@ -1771,12 +1731,9 @@ function App() {
                           <tr key={t.id} className="team-row" style={{ cursor: isAdmin ? 'pointer' : 'default' }} onClick={() => isAdmin && handleOpenEditModal(t)}>
                             <td className="cell-small">{idx+1}</td>
                             <td className="team-cell">
-                              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                <span className="team-logo-wrap"><TeamLogo team={teams.find(t2=>t2.id===t.id)} size={26} /></span>
-                                <div>
-                                  <div className="team-name">{t.name}</div>
-                                  <div className="player-names">{t.player1} &amp; {t.player2}</div>
-                                </div>
+                              <div>
+                                <div className="team-name">{t.name}</div>
+                                <div className="player-names">{t.player1} &amp; {t.player2}</div>
                               </div>
                             </td>
                             <td className="cell-small">{t.won}</td>
@@ -1828,12 +1785,9 @@ function App() {
                     <tr key={team.id} className="team-row" style={{ cursor: isAdmin ? 'pointer' : 'default', background: isMedal ? 'rgba(251,191,36,0.08)' : undefined }} onClick={() => isAdmin && handleOpenEditModal(teams.find(t => t.id === team.id) || team)}>
                       <td className="cell-small" style={{ fontWeight: isMedal ? 800 : 400 }}>{medalEmoji} {rankDisplay}</td>
                       <td className="team-cell">
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                          <span className="team-logo-wrap"><TeamLogo team={teams.find(t=>t.id===team.id)} size={26} /></span>
-                          <div>
-                            <div className="team-name">{team.name}</div>
-                            <div className="player-names">{team.player1} &amp; {team.player2}</div>
-                          </div>
+                        <div>
+                          <div className="team-name">{team.name}</div>
+                          <div className="player-names">{team.player1} &amp; {team.player2}</div>
                         </div>
                       </td>
                       <td className="cell-small" style={{ fontStyle: 'italic', color: '#fbbf24' }}>
@@ -2164,7 +2118,6 @@ function App() {
                 <div>
                   <label style={{ color: '#fbbf24', fontSize: '0.9rem', fontWeight: 'bold' }}>Icon đội (Tải lên ảnh):</label>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 6 }}>
-                    <TeamLogo team={editData} size={52} />
                     <div style={{ flex: 1 }}>
                       <input
                         type="file"
