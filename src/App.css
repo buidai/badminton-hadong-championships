@@ -299,6 +299,15 @@ body {
   opacity: 0.5;
   cursor: not-allowed;
 }
+.btn-danger-action {
+  background: rgba(239,68,68,0.12);
+  border: 1px solid rgba(239,68,68,0.3);
+  color: #f87171;
+}
+.btn-danger-action:hover:not(:disabled) {
+  background: rgba(239,68,68,0.22);
+  transform: translateY(-1px);
+}
 
 /* ─── Hero Right Panel (image + MVP) ─── */
 .hero-right {
@@ -1717,9 +1726,23 @@ body {
   .standings-table td {
     padding: 8px 7px;
     font-size: 0.82rem;
-  }
   .team-cell {
-    min-width: 120px;
+    /* ensure long player names wrap instead of stretching the table */
+    max-width: 220px;
+    min-width: 0;
+  }
+  .team-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+  }
+  .player-names {
+    font-size: 0.72rem;
+    color: #64748b;
+    line-height: 1.25;
+    word-break: break-word;
+    overflow-wrap: anywhere;
   }
 
   /* Tabs: 2 columns already handled at 768; tighten at 640 */

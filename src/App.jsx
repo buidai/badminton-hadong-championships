@@ -530,6 +530,76 @@ function App() {
     setLoading(false)
   }
 
+  // ─── Alpha-only: Rollback to initial seeded data (with warning) ───
+  const [rollbackOpen, setRollbackOpen] = useState(false)
+  const REAL_TEAMS_INITIAL = [
+    { group: 'A', label: 'A1', p1: 'Quản Thành Công', p2: 'Nguyễn Quý Thanh', name: 'Đôi Đũa Lệch' },
+    { group: 'A', label: 'A2', p1: 'Tuấn Đào', p2: 'Hà Hồng', name: 'Đèo Bòng Cầu Lông' },
+    { group: 'A', label: 'A3', p1: 'Phạm Minh Quang', p2: 'Ngọc Quỳnh', name: 'Song Sắt Song Sành' },
+    { group: 'A', label: 'A4', p1: 'Hoàng Nam', p2: 'Dương Thị Thu Phương', name: 'Đôi Cánh Vàng' },
+    { group: 'B', label: 'B1', p1: 'Đặng Anh Quang', p2: 'Thanh Thu', name: 'Gió Đưa Hờn' },
+    { group: 'B', label: 'B2', p1: 'Nguyễn Lộc', p2: 'Lê Dung', name: 'Chạy Lại Đi' },
+    { group: 'B', label: 'B3', p1: 'Linh', p2: 'Bùi Thùy Dương', name: 'Tay Mơ Nhưng Chơi' },
+    { group: 'B', label: 'B4', p1: 'Nguyên Phương Nam', p2: 'An Thanh', name: 'Anh Thanh Cả' },
+    { group: 'C', label: 'C1', p1: 'Đại', p2: 'Phạm Thị Thu', name: 'Đại Gia Đình' },
+    { group: 'C', label: 'C2', p1: 'Đào Văn Trường', p2: 'Đỗ Linh', name: 'Trường Kỳ Kháng Chiến' },
+    { group: 'C', label: 'C3', p1: 'Phong Lê', p2: 'Dương Minh Ngọc', name: 'Phong Độ Đỉnh' },
+    { group: 'C', label: 'C4', p1: 'Đức Hưng', p2: 'Hoa', name: 'Hoa Cười Cỏ Thơm' },
+    { group: 'D', label: 'D1', p1: 'Duy Toàn', p2: 'Ngân Nguyễn', name: 'Toàn Tôm Tắt' },
+    { group: 'D', label: 'D2', p1: 'Hai An', p2: 'Jet Tran', name: 'Hai An Toàn' },
+    { group: 'D', label: 'D3', p1: 'BT Thức', p2: 'Kim Hồng', name: 'Thức Thì Thua' },
+    { group: 'D', label: 'D4', p1: 'Pham Thanh Tú', p2: 'Hồng Anh', name: 'Thúy Kiều Tú' },
+  ]
+  const rollbackToInitial = async () => {
+    setRollbackOpen(false)
+    setLoading(true)
+    try {
+      // clear teams + matches
+      const tSnap = await getDocs(collection(db, 'teams'))
+      const mSnap = await getDocs(collection(db, 'matches'))
+      const batchDel = writeBatch(db)
+      tSnap.forEach(d => batchDel.delete(doc(db, 'teams', d.id)))
+      mSnap.forEach(d => batchDel.delete(doc(db, 'matches', d.id)))
+      await batchDel.commit()
+
+      const batch = writeBatch(db)
+      const teamsRef = collection(db, 'teams')
+      const grouped = { A: [], B: [], C: [], D: [] }
+      REAL_TEAMS_INITIAL.forEach(t => {
+        const ref = doc(teamsRef)
+        batch.set(ref, {
+          name: t.name, teamLabel: t.label, player1: t.p1, player2: t.p2,
+          group: t.group, played: 0, won: 0, lost: 0, points: 0,
+          setDifference: 0, setsFor: 0, setsAgainst: 0
+        })
+        grouped[t.group].push({ id: ref.id, label: t.label })
+      })
+      const pattern = [ [0,1],[2,3],[0,2],[1,3],[0,3],[1,2] ]
+      const matchesRef = collection(db, 'matches')
+      let order = 0
+      ;['A','B','C','D'].forEach(g => {
+        const ts = grouped[g]
+        pattern.forEach(([pa,pb]) => {
+          order++
+          const ref = doc(matchesRef)
+          batch.set(ref, {
+            group: g, round: Math.ceil(order/4), stage: 'GROUP_STAGE',
+            teamA_id: ts[pa].id, teamA_name: `Đội ${ts[pa].label}`,
+            teamB_id: ts[pb].id, teamB_name: `Đội ${ts[pb].label}`,
+            status: 'UPCOMING', matchOrder: order
+          })
+        })
+      })
+      await batch.commit()
+      toast('↩ Đã rollback về dữ liệu ban đầu (16 đội, 24 trận chưa có kết quả)')
+      fetchTeams()
+    } catch (e) {
+      console.error('Rollback lỗi:', e)
+      toast('❌ Lỗi khi rollback dữ liệu')
+    }
+    setLoading(false)
+  }
+
   // 2. LOGIC TẠO LỊCH THI ĐẤU (Hỗ trợ bảng 3 hoặc 4 đội round-robin)
   const generateSchedule = async () => {
     // Kiểm tra mỗi bảng có ít nhất 3 đội
@@ -1564,6 +1634,7 @@ function App() {
             <button onClick={generateMockTeams} className="btn-hero-action" disabled={loading}>🎲 Tạo đội mẫu</button>
             <button onClick={generateSchedule} className="btn-hero-action" disabled={loading}>📅 Tạo lịch vòng bảng</button>
             <button onClick={generatePhase2AndFinals} className="btn-hero-action" disabled={loading}>🏆 Tạo lượt 2 & chung kết</button>
+            <button onClick={() => setRollbackOpen(true)} className="btn-hero-action btn-danger-action" disabled={loading}>↩ Rollback data</button>
           </div>
         )}
       </div>
@@ -1703,7 +1774,7 @@ function App() {
                                 <TeamLogo team={teams.find(t2=>t2.id===t.id)} size={30} />
                                 <div>
                                   <div className="team-name">{t.name}</div>
-                                  <div style={{ fontSize: '0.72rem', color: '#64748b' }}>{t.player1} &amp; {t.player2}</div>
+                                  <div className="player-names">{t.player1} &amp; {t.player2}</div>
                                 </div>
                               </div>
                             </td>
@@ -1760,7 +1831,7 @@ function App() {
                           <TeamLogo team={teams.find(t=>t.id===team.id)} size={30} />
                           <div>
                             <div className="team-name">{team.name}</div>
-                            <div style={{ fontSize: '0.72rem', color: '#64748b' }}>{team.player1} &amp; {team.player2}</div>
+                            <div className="player-names">{team.player1} &amp; {team.player2}</div>
                           </div>
                         </div>
                       </td>
@@ -2197,6 +2268,29 @@ function App() {
                   setGroupNamesEditOpen(false)
                 } catch(e) { toast('Lỗi khi lưu tên bảng') }
               }}>💾 Lưu</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Rollback Warning Modal (Alpha) */}
+      {rollbackOpen && (
+        <div className="modal-overlay" onClick={() => setRollbackOpen(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: 460 }}>
+            <button className="close-btn" onClick={() => setRollbackOpen(false)}>×</button>
+            <div style={{ textAlign: 'center', fontSize: '2.4rem', marginBottom: 8 }}>⚠️</div>
+            <h2 style={{ color: '#ef4444', textAlign: 'center', marginBottom: 12 }}>XÁC NHẬN ROLLBACK DỮ LIỆU</h2>
+            <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 10, padding: '12px 14px', marginBottom: 18, fontSize: '0.88rem', color: '#fca5a5', lineHeight: 1.6 }}>
+              🧪 <b>Bản Alpha thử nghiệm.</b> Hành động này sẽ <b>xóa toàn bộ</b> dữ liệu hiện tại (đội, vận động viên, lịch thi đấu, tỉ số, MVP) và khôi phục về <b>dữ liệu ban đầu</b>: 16 đội + 24 trận vòng bảng <b>chưa có kết quả</b>.<br/><br/>
+              ⚠️ Thao tác <b>không thể hoàn tác</b>. Hãy chắc chắn bạn đã sao lưu nếu cần.
+            </div>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button onClick={() => setRollbackOpen(false)} style={{ flex: 1, background: 'rgba(148,163,184,0.15)', color: 'var(--text)', border: 'none', padding: '12px', borderRadius: 8, cursor: 'pointer', fontWeight: 600 }}>
+                Huỷ
+              </button>
+              <button onClick={rollbackToInitial} style={{ flex: 1, background: 'linear-gradient(135deg,#ef4444,#dc2626)', color: '#fff', border: 'none', padding: '12px', borderRadius: 8, cursor: 'pointer', fontWeight: 800 }}>
+                ↩ Tôi đã hiểu, Rollback
+              </button>
             </div>
           </div>
         </div>
