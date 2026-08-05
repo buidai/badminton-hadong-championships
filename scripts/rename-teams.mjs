@@ -1,6 +1,6 @@
 /**
- * Update team display names using the REAL male player's name (accurate, traceable
- * to the seeded player list). Keeps player1/player2 unchanged.
+ * Set team display names = combined "Player1 & Player2" (real members).
+ * Admin can later override the `name` field (capped at 26 chars in UI).
  * Run: FIREBASE_TOKEN=xxx node scripts/rename-teams.mjs
  */
 import { initializeApp } from 'firebase/app'
@@ -17,24 +17,8 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig)
 const db = getFirestore(app)
 
-const NAMES = {
-  A1: 'Thành Công',
-  A2: 'Tuấn Đào',
-  A3: 'Minh Quang',
-  A4: 'Hoàng Nam',
-  B1: 'Anh Quang',
-  B2: 'Nguyễn Lộc',
-  B3: 'Linh',
-  B4: 'Phương Nam',
-  C1: 'Đại',
-  C2: 'Văn Trường',
-  C3: 'Phong Lê',
-  C4: 'Đức Hưng',
-  D1: 'Duy Toàn',
-  D2: 'Hai An',
-  D3: 'BT Thức',
-  D4: 'Thanh Tú',
-}
+const MAX = 26
+const cap = s => s.length > MAX ? s.slice(0, MAX - 1) + '…' : s
 
 async function run() {
   const snap = await getDocs(collection(db, 'teams'))
@@ -42,15 +26,13 @@ async function run() {
   let n = 0
   snap.forEach(d => {
     const t = d.data()
-    const label = t.teamLabel
-    if (label && NAMES[label]) {
-      b.update(doc(db, 'teams', d.id), { name: NAMES[label] })
-      console.log(`  ${label}: ${t.name} -> ${NAMES[label]}`)
-      n++
-    }
+    const combined = cap(`${t.player1 || ''} & ${t.player2 || ''}`.trim())
+    b.update(doc(db, 'teams', d.id), { name: combined })
+    console.log(`  ${t.teamLabel}: ${combined}`)
+    n++
   })
   await b.commit()
-  console.log(`\n✅ Updated ${n} team names.`)
+  console.log(`\n✅ Updated ${n} team names (player1 & player2).`)
   process.exit(0)
 }
 run().catch(e => { console.error('❌', e); process.exit(1) })

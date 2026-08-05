@@ -533,22 +533,22 @@ function App() {
   // ─── Alpha-only: Rollback to initial seeded data (with warning) ───
   const [rollbackOpen, setRollbackOpen] = useState(false)
   const REAL_TEAMS_INITIAL = [
-    { group: 'A', label: 'A1', p1: 'Quản Thành Công', p2: 'Nguyễn Quý Thanh', name: 'Thành Công' },
-    { group: 'A', label: 'A2', p1: 'Tuấn Đào', p2: 'Hà Hồng', name: 'Tuấn Đào' },
-    { group: 'A', label: 'A3', p1: 'Phạm Minh Quang', p2: 'Ngọc Quỳnh', name: 'Minh Quang' },
-    { group: 'A', label: 'A4', p1: 'Hoàng Nam', p2: 'Dương Thị Thu Phương', name: 'Hoàng Nam' },
-    { group: 'B', label: 'B1', p1: 'Đặng Anh Quang', p2: 'Thanh Thu', name: 'Anh Quang' },
-    { group: 'B', label: 'B2', p1: 'Nguyễn Lộc', p2: 'Lê Dung', name: 'Nguyễn Lộc' },
-    { group: 'B', label: 'B3', p1: 'Linh', p2: 'Bùi Thùy Dương', name: 'Linh' },
-    { group: 'B', label: 'B4', p1: 'Nguyên Phương Nam', p2: 'An Thanh', name: 'Phương Nam' },
-    { group: 'C', label: 'C1', p1: 'Đại', p2: 'Phạm Thị Thu', name: 'Đại' },
-    { group: 'C', label: 'C2', p1: 'Đào Văn Trường', p2: 'Đỗ Linh', name: 'Văn Trường' },
-    { group: 'C', label: 'C3', p1: 'Phong Lê', p2: 'Dương Minh Ngọc', name: 'Phong Lê' },
-    { group: 'C', label: 'C4', p1: 'Đức Hưng', p2: 'Hoa', name: 'Đức Hưng' },
-    { group: 'D', label: 'D1', p1: 'Duy Toàn', p2: 'Ngân Nguyễn', name: 'Duy Toàn' },
-    { group: 'D', label: 'D2', p1: 'Hai An', p2: 'Jet Tran', name: 'Hai An' },
-    { group: 'D', label: 'D3', p1: 'BT Thức', p2: 'Kim Hồng', name: 'BT Thức' },
-    { group: 'D', label: 'D4', p1: 'Pham Thanh Tú', p2: 'Hồng Anh', name: 'Thanh Tú' },
+    { group: 'A', label: 'A1', p1: 'Quản Thành Công', p2: 'Nguyễn Quý Thanh', name: 'Quản Thành Công & Nguyễn Quý Thanh' },
+    { group: 'A', label: 'A2', p1: 'Tuấn Đào', p2: 'Hà Hồng', name: 'Tuấn Đào & Hà Hồng' },
+    { group: 'A', label: 'A3', p1: 'Phạm Minh Quang', p2: 'Ngọc Quỳnh', name: 'Phạm Minh Quang & Ngọc Quỳnh' },
+    { group: 'A', label: 'A4', p1: 'Hoàng Nam', p2: 'Dương Thị Thu Phương', name: 'Hoàng Nam & Dương Thị Thu Phương' },
+    { group: 'B', label: 'B1', p1: 'Đặng Anh Quang', p2: 'Thanh Thu', name: 'Đặng Anh Quang & Thanh Thu' },
+    { group: 'B', label: 'B2', p1: 'Nguyễn Lộc', p2: 'Lê Dung', name: 'Nguyễn Lộc & Lê Dung' },
+    { group: 'B', label: 'B3', p1: 'Linh', p2: 'Bùi Thùy Dương', name: 'Linh & Bùi Thùy Dương' },
+    { group: 'B', label: 'B4', p1: 'Nguyên Phương Nam', p2: 'An Thanh', name: 'Nguyên Phương Nam & An Thanh' },
+    { group: 'C', label: 'C1', p1: 'Đại', p2: 'Phạm Thị Thu', name: 'Đại & Phạm Thị Thu' },
+    { group: 'C', label: 'C2', p1: 'Đào Văn Trường', p2: 'Đỗ Linh', name: 'Đào Văn Trường & Đỗ Linh' },
+    { group: 'C', label: 'C3', p1: 'Phong Lê', p2: 'Dương Minh Ngọc', name: 'Phong Lê & Dương Minh Ngọc' },
+    { group: 'C', label: 'C4', p1: 'Đức Hưng', p2: 'Hoa', name: 'Đức Hưng & Hoa' },
+    { group: 'D', label: 'D1', p1: 'Duy Toàn', p2: 'Ngân Nguyễn', name: 'Duy Toàn & Ngân Nguyễn' },
+    { group: 'D', label: 'D2', p1: 'Hai An', p2: 'Jet Tran', name: 'Hai An & Jet Tran' },
+    { group: 'D', label: 'D3', p1: 'BT Thức', p2: 'Kim Hồng', name: 'BT Thức & Kim Hồng' },
+    { group: 'D', label: 'D4', p1: 'Pham Thanh Tú', p2: 'Hồng Anh', name: 'Pham Thanh Tú & Hồng Anh' },
   ]
   const rollbackToInitial = async () => {
     setRollbackOpen(false)
@@ -1336,6 +1336,17 @@ function App() {
     }
   }
 
+  // Display name for a team: explicit name if set, else auto-combine both players.
+  // Length is capped so the layout never breaks (CSS also clamps with ellipsis).
+  const TEAM_NAME_MAX = 26
+  const teamDisplayName = (t) => {
+    if (!t) return '???'
+    const custom = (t.name || '').trim()
+    if (custom) return custom.length > TEAM_NAME_MAX ? custom.slice(0, TEAM_NAME_MAX - 1) + '…' : custom
+    const base = `${t.player1 || ''} & ${t.player2 || ''}`.trim()
+    return base.length > TEAM_NAME_MAX ? base.slice(0, TEAM_NAME_MAX - 1) + '…' : base
+  }
+
   const BADMINTON_MEMES = [
     '🏸 "Cú smash này đến từ nỗi đau!" 😤',
     '🍺 "Sau giải là nhậu thôi!" 🎉',
@@ -1732,7 +1743,7 @@ function App() {
                             <td className="cell-small">{idx+1}</td>
                             <td className="team-cell">
                               <div>
-                                <div className="team-name">{t.name}</div>
+                                <div className="team-name">{teamDisplayName(t)}</div>
                                 <div className="player-names">{t.player1} &amp; {t.player2}</div>
                               </div>
                             </td>
@@ -1786,7 +1797,7 @@ function App() {
                       <td className="cell-small" style={{ fontWeight: isMedal ? 800 : 400 }}>{medalEmoji} {rankDisplay}</td>
                       <td className="team-cell">
                         <div>
-                          <div className="team-name">{team.name}</div>
+                          <div className="team-name">{teamDisplayName(team)}</div>
                           <div className="player-names">{team.player1} &amp; {team.player2}</div>
                         </div>
                       </td>
@@ -1953,7 +1964,7 @@ function App() {
                                 return (
                                   <div key={rank} className="compact-rank">
                                     <span className="compact-rank__medal">{medal}</span>
-                                    <span className="compact-rank__name">{team ? team.name : '???'}</span>
+                                    <span className="compact-rank__name">{team ? teamDisplayName(team) : '???'}</span>
                                   </div>
                                 )
                               })}
@@ -2075,9 +2086,10 @@ function App() {
                  />
                </div>
                <div>
-                 <label style={{ color: '#94a3b8', fontSize: '0.85rem' }}>Tên đội:</label>
+                 <label style={{ color: '#94a3b8', fontSize: '0.85rem' }}>Tên đội (tối đa 26 ký tự, để trống = ghép tên 2 VĐV):</label>
                  <input
                    type="text"
+                   maxLength={26}
                    value={editData.name || ''}
                    onChange={e => setEditData({ ...editData, name: e.target.value })}
                    style={{ width: '100%', padding: '8px', borderRadius: '4px', border: 'none', background: '#334155', color: 'white', marginTop: '4px' }}
